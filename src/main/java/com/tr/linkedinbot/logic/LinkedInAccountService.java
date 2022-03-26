@@ -22,7 +22,7 @@ public class LinkedInAccountService {
     public void createNewProfile(Message message, String username) {
         Optional<LinkedInProfile> byId = linkedInProfileRepository.findById(message.getChatId());
         if (byId.isPresent()) {
-            throw new IllegalLinkedInProfileException("Ты уже загрузил профиль, большего не нужно:)");
+            throw new IllegalLinkedInProfileException("Ты уже загрузил профиль, большего не нужно :)");
         }
         var text = message.getText();
         var linkedInValidUrlPattern = compile("((https?:\\/\\/)?((www|\\w\\w)\\.)?linkedin\\.com\\/)((([\\w]{2,3})?)|([^\\/]+\\/(([\\w|\\d-&#?=])+\\/?){1,}))$");

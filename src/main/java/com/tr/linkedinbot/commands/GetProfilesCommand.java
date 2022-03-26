@@ -35,7 +35,7 @@ public class GetProfilesCommand extends ServiceCommand {
                 String.format("%s %s", chat.getLastName(), chat.getFirstName());
         boolean userLoadedHisProfile = linkedInAccountService.validateUpload(chat.getId(), userName);
         if (!userLoadedHisProfile) {
-            response = "По нашим правилам, сначала ты грузишь свой профиль, а потом мы покажем тебе чужие:\n" +
+            response = "По нашим правилам, сначала ты грузишь свой профиль, а потом мы покажем тебе чужие\n" +
                     "With love TR++";
         } else {
             List<LinkedInProfile> linkedInProfiles = linkedInAccountService.loadAll();
