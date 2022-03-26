@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: linkedin-bot
+  datasource:
+    url: "jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?currentSchema=${DATABASE_SCHEMA}"
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    platform: POSTGRESQL
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    hibernate:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.PostgreSQL9Dialect
+      show_sql: true
+    properties.hibernate.temp.use_jdbc_metadata_defaults: false
+
+
+bot:
+  name: ${BOT_NAME}
+  token: ${BOT_TOKEN}
+
+server:
+  port: ${PORT:8080}
