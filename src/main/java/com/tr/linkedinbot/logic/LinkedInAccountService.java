@@ -2,10 +2,12 @@ package com.tr.linkedinbot.logic;
 
 import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
 import com.tr.linkedinbot.model.LinkedInProfile;
+import com.tr.linkedinbot.notifications.LinkedInProfileCreateEvent;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import static java.util.regex.Pattern.compile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
@@ -18,6 +20,8 @@ import java.util.Optional;
 public class LinkedInAccountService {
 
     private final LinkedInProfileRepository linkedInProfileRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
 
     public void createNewProfile(Message message, String username) {
         Optional<LinkedInProfile> byId = linkedInProfileRepository.findById(message.getChatId());
@@ -38,11 +42,22 @@ public class LinkedInAccountService {
         linkedInProfileRepository.save(newProfile);
 
         log.info(">>> new member added {}", text);
+
+        var event = new LinkedInProfileCreateEvent(this, newProfile);
+        applicationEventPublisher.publishEvent(event);
     }
 
     public List<LinkedInProfile> loadAll() {
         return linkedInProfileRepository.findAll();
     }
+
+    public List<LinkedInProfile> loadAll(Long chatId, String tgName) {
+        List<LinkedInProfile> all = linkedInProfileRepository.findAll();
+        all.removeIf(linkedInProfile -> linkedInProfile.getTgUser().equals(tgName) ||
+                linkedInProfile.getChatId().equals(chatId));
+        return all;
+    }
+
 
     public boolean validateUpload(Long chatId, String tgName) {
         return linkedInProfileRepository.existsByChatIdOrTgUser(chatId, tgName);
