@@ -2,6 +2,7 @@ package com.tr.linkedinbot.notifications;
 
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.LinkedInBot;
+import com.tr.linkedinbot.model.LinkedInProfile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -21,18 +22,23 @@ public class NewUserRegisteredListener implements ApplicationListener<LinkedInPr
     public void onApplicationEvent(LinkedInProfileCreateEvent event) {
         linkedInAccountService.loadAll().stream()
                 .filter(linkedInProfile -> !linkedInProfile.getTgUser().equals(event.getLinkedInProfile().getTgUser()))
-                .map(linkedInProfile -> {
-                    SendMessage sm = new SendMessage();
-                    sm.setChatId(linkedInProfile.getChatId().toString());
-                    sm.setText("Гляди у нас новый профиль! Добавляй в друзья: " + event.getLinkedInProfile().getLinkedInUrl());
-                    return sm;
-                }).forEach(sendMessage -> {
-                    try {
-                        linkedInBot.execute(sendMessage);
-                        log.debug("sendMessage - {} sent", sendMessage);
-                    } catch (TelegramApiException e) {
-                        log.error("Error notifying chat_id {}, error_message:{}", sendMessage.getChatId(), e.getMessage());
-                    }
-                });
+                .map(linkedInProfile -> getSendMessage(event, linkedInProfile))
+                .forEach(this::sendNotification);
+    }
+
+    private void sendNotification(SendMessage sendMessage) {
+        try {
+            linkedInBot.execute(sendMessage);
+            log.debug("sendMessage - {} sent", sendMessage);
+        } catch (TelegramApiException e) {
+            log.error("Error notifying chat_id {}, error_message:{}", sendMessage.getChatId(), e.getMessage());
+        }
+    }
+
+    private SendMessage getSendMessage(LinkedInProfileCreateEvent event, LinkedInProfile linkedInProfile) {
+        SendMessage sm = new SendMessage();
+        sm.setChatId(linkedInProfile.getChatId().toString());
+        sm.setText("Гляди у нас новый профиль! Добавляй в друзья: " + event.getLinkedInProfile().getLinkedInUrl());
+        return sm;
     }
 }
