@@ -38,7 +38,7 @@ public class GetProfilesCommand extends ServiceCommand {
             response = "По нашим правилам, сначала ты грузишь свой профиль, а потом мы покажем тебе чужие\n" +
                     "With love TR++";
         } else {
-            List<LinkedInProfile> linkedInProfiles = linkedInAccountService.loadAll();
+            List<LinkedInProfile> linkedInProfiles = linkedInAccountService.loadAll(chat.getId(), userName);
             response = linkedInProfiles.stream().map(LinkedInProfile::getLinkedInUrl).collect(Collectors.joining("\n"));
             if (response.isBlank()) {
                 response = "Нам пока нечего тебе показать( Пингани ребят в чате, чтоб грузили свои профили!\n" +
