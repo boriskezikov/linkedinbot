@@ -1,5 +1,7 @@
 package com.tr.linkedinbot.commands;
 
+import static com.tr.linkedinbot.commands.TextConstants.DONT_UNDERSTAND_GLOBAL_ERROR_TEXT;
+import static com.tr.linkedinbot.commands.TextConstants.PROFILE_SAVED_MESSAGE_TEXT;
 import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +18,11 @@ public class NonCommand {
         String answer;
         try {
             accountParser.createNewProfile(message, userName);
-            answer = "Сохранил твой профиль. Можешь приступать к добавлению новых контактов.\n" +
-                    "With love TR++";
+            answer = PROFILE_SAVED_MESSAGE_TEXT;
         } catch (IllegalLinkedInProfileException e) {
                 answer =  e.getMessage();
         } catch (Exception e) {
-            answer = "Простите, я не понимаю Вас. Возможно, Вам поможет /help\n" +
-                    "With love TR++";
+            answer = DONT_UNDERSTAND_GLOBAL_ERROR_TEXT;
         }
         return answer;
     }
