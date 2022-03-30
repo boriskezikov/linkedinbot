@@ -23,7 +23,7 @@ public class GetProfilesCommand extends ServiceCommand {
 
     @Override
     public String getCommandIdentifier() {
-        return "get_profiles";
+        return "get_next_profiles";
     }
 
     @Override
