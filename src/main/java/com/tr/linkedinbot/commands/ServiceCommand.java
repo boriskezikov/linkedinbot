@@ -47,7 +47,7 @@ public abstract class ServiceCommand implements IBotCommand {
 
     public ReplyKeyboardMarkup getAdminKeyboard() {
         KeyboardRow row1 = new KeyboardRow();
-        row1.add(new KeyboardButton(ButtonNameEnum.GET_PROFILES.getButtonName()));
+        row1.add(new KeyboardButton(ButtonNameEnum.GET_NEXT_PROFILES.getButtonName()));
         row1.add(new KeyboardButton(ButtonNameEnum.HELP.getButtonName()));
 
         KeyboardRow row2 = new KeyboardRow();
@@ -70,7 +70,7 @@ public abstract class ServiceCommand implements IBotCommand {
 
     public ReplyKeyboardMarkup getUserKeyboard() {
         KeyboardRow row1 = new KeyboardRow();
-        row1.add(new KeyboardButton(ButtonNameEnum.GET_PROFILES.getButtonName()));
+        row1.add(new KeyboardButton(ButtonNameEnum.GET_NEXT_PROFILES.getButtonName()));
 
         KeyboardRow row2 = new KeyboardRow();
         row2.add(new KeyboardButton(ButtonNameEnum.HELP.getButtonName()));

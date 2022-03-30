@@ -11,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -48,7 +47,7 @@ public class GetProfilesCommand extends ServiceCommand {
 
     private String getProfiles(Chat chat, String userName) {
         String getProfilesMessage;
-        var linkedInProfiles = getLinkedInProfiles(chat, userName);
+        var linkedInProfiles = linkedInAccountService.loadRandomRecords(chat.getId(), userName, config.getRandomLimit());
         if (linkedInProfiles.isEmpty()) {
             getProfilesMessage = GET_PROFILES_NO_USERS_MESSAGE_TEXT;
         } else {
@@ -56,15 +55,5 @@ public class GetProfilesCommand extends ServiceCommand {
             getProfilesMessage = "\uD83D\uDE80" + response + "\n\nWith Love TR++\uD83D\uDE09";
         }
         return getProfilesMessage;
-    }
-
-    private List<LinkedInProfile> getLinkedInProfiles(Chat chat, String userName) {
-        List<LinkedInProfile> linkedInProfiles;
-        if (linkedInAccountService.countUsers() <= 100) {
-            linkedInProfiles = linkedInAccountService.loadAll(chat.getId(), userName);
-        } else {
-            linkedInProfiles = linkedInAccountService.loadRandomRecords(chat.getId(), userName, config.getRandomLimit());
-        }
-        return linkedInProfiles;
     }
 }
