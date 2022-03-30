@@ -1,5 +1,8 @@
 package com.tr.linkedinbot.commands;
 
+import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_LOAD_ACC_FIRST_MESSAGE_TEXT;
+import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_NO_USERS_MESSAGE_TEXT;
+import com.tr.linkedinbot.config.LinkedInBotConfig;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.model.LinkedInProfile;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 public class GetProfilesCommand extends ServiceCommand {
 
     private final LinkedInAccountService linkedInAccountService;
+    private final LinkedInBotConfig config;
 
     @Override
     public String getCommandIdentifier() {
@@ -29,23 +33,38 @@ public class GetProfilesCommand extends ServiceCommand {
 
     @Override
     public void processMessage(AbsSender absSender, Message message, String[] arguments) {
-        String response;
+        String getProfilesMessage;
         Chat chat = message.getChat();
         var userName = (chat.getUserName() != null) ? chat.getUserName() :
                 String.format("%s %s", chat.getLastName(), chat.getFirstName());
         boolean userLoadedHisProfile = linkedInAccountService.validateUpload(chat.getId(), userName);
         if (!userLoadedHisProfile) {
-            response = "По нашим правилам, сначала ты грузишь свой профиль, а потом мы покажем тебе чужие\n" +
-                    "With love TR++";
+            getProfilesMessage = GET_PROFILES_LOAD_ACC_FIRST_MESSAGE_TEXT;
         } else {
-            List<LinkedInProfile> linkedInProfiles = linkedInAccountService.loadAll(chat.getId(), userName);
-            response = linkedInProfiles.stream().map(LinkedInProfile::getLinkedInUrl).collect(Collectors.joining("\n"));
-            if (response.isBlank()) {
-                response = "Нам пока нечего тебе показать( Пингани ребят в чате, чтоб грузили свои профили!\n" +
-                        "With love TR++";
-            }
+            getProfilesMessage = getProfiles(chat, userName);
         }
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, getProfilesMessage);
+    }
 
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, response);
+    private String getProfiles(Chat chat, String userName) {
+        String getProfilesMessage;
+        var linkedInProfiles = getLinkedInProfiles(chat, userName);
+        if (linkedInProfiles.isEmpty()) {
+            getProfilesMessage = GET_PROFILES_NO_USERS_MESSAGE_TEXT;
+        } else {
+            var response = linkedInProfiles.stream().map(LinkedInProfile::getLinkedInUrl).collect(Collectors.joining("\n\n\uD83D\uDE80"));
+            getProfilesMessage = "\uD83D\uDE80" + response + "\n\nWith Love TR++\uD83D\uDE09";
+        }
+        return getProfilesMessage;
+    }
+
+    private List<LinkedInProfile> getLinkedInProfiles(Chat chat, String userName) {
+        List<LinkedInProfile> linkedInProfiles;
+        if (linkedInAccountService.countUsers() <= 100) {
+            linkedInProfiles = linkedInAccountService.loadAll(chat.getId(), userName);
+        } else {
+            linkedInProfiles = linkedInAccountService.loadRandomRecords(chat.getId(), userName, config.getRandomLimit());
+        }
+        return linkedInProfiles;
     }
 }

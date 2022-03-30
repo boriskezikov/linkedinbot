@@ -1,5 +1,6 @@
 package com.tr.linkedinbot.commands;
 
+import static com.tr.linkedinbot.commands.TextConstants.HELP_MESSAGE_TEXT;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -13,12 +14,7 @@ public class HelpCommand extends ServiceCommand {
         Chat chat = message.getChat();
         String userName = (chat.getUserName() != null) ? chat.getUserName() :
                 String.format("%s %s", chat.getLastName(), chat.getFirstName());
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName,
-                "Я помогу обзавестить коннектами с участниками нашего сообщества в LinkedIn!\n" +
-                        "Кидай ссылку на свой профиль, и я поделюсь с тобой контактами!\n\n" +
-                        "Вот пример рабочей ссылки: https://www.linkedin.com/in/boriskezikov/\n" +
-                        "Если что-то идет не так, пиши @kezikoff, он прикрутит пару костылей:) \n" +
-                        "With love TR++");
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, HELP_MESSAGE_TEXT);
     }
 
     @Override

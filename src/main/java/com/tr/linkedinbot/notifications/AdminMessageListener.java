@@ -1,6 +1,6 @@
 package com.tr.linkedinbot.notifications;
 
-import static com.tr.linkedinbot.commands.TextConstants.NEW_PROFILE_NOTIFICATION_MESSAGE_TEXT;
+import static com.tr.linkedinbot.commands.TextConstants.ADMIN_MESSAGE;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.LinkedInBot;
 import com.tr.linkedinbot.model.LinkedInProfile;
@@ -14,16 +14,16 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class NewUserRegisteredListener implements ApplicationListener<LinkedInProfileCreateEvent> {
+public class AdminMessageListener implements ApplicationListener<AdminMessageEvent> {
+
 
     private final LinkedInAccountService linkedInAccountService;
     private final LinkedInBot linkedInBot;
 
     @Override
-    public void onApplicationEvent(LinkedInProfileCreateEvent event) {
+    public void onApplicationEvent(AdminMessageEvent event) {
         linkedInAccountService.loadAll().stream()
-                .filter(linkedInProfile -> !linkedInProfile.getTgUser().equals(event.getLinkedInProfile().getTgUser()))
-                .map(linkedInProfile -> getSendMessage(event, linkedInProfile))
+                .map(linkedInProfile -> getSendMessage(linkedInProfile, event.getMessage()))
                 .forEach(this::sendNotification);
     }
 
@@ -36,10 +36,10 @@ public class NewUserRegisteredListener implements ApplicationListener<LinkedInPr
         }
     }
 
-    private SendMessage getSendMessage(LinkedInProfileCreateEvent event, LinkedInProfile linkedInProfile) {
+    private SendMessage getSendMessage(LinkedInProfile linkedInProfile, String adminMessage) {
         SendMessage sm = new SendMessage();
         sm.setChatId(linkedInProfile.getChatId().toString());
-        sm.setText(NEW_PROFILE_NOTIFICATION_MESSAGE_TEXT + event.getLinkedInProfile().getLinkedInUrl());
+        sm.setText(ADMIN_MESSAGE + adminMessage);
         return sm;
     }
 }

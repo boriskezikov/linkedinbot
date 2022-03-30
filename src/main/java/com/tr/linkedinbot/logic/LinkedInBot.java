@@ -5,8 +5,10 @@ import com.tr.linkedinbot.commands.HelpCommand;
 import com.tr.linkedinbot.commands.NonCommand;
 import com.tr.linkedinbot.commands.StartCommand;
 import com.tr.linkedinbot.config.LinkedInBotConfig;
+import com.tr.linkedinbot.notifications.AdminMessageEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -28,6 +30,9 @@ public class LinkedInBot extends TelegramLongPollingCommandBot {
     private final HelpCommand helpCommand;
     private final StartCommand startCommand;
     private final GetProfilesCommand getProfilesCommand;
+    private final LinkedInBotConfig botConfig;
+    private final LinkedInAccountService linkedInAccountService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @PostConstruct
     public void init() {
@@ -39,16 +44,38 @@ public class LinkedInBot extends TelegramLongPollingCommandBot {
 
     @Override
     public void processNonCommandUpdate(Update update) {
-        Message msg = update.getMessage();
-        Long chatId = msg.getChatId();
-        String userName = getUserName(msg);
-        String answer = nonCommand.nonCommandExecute(msg, userName);
-        setAnswer(chatId, userName, answer);
+        Message message = update.getMessage();
+        Long chatId = message.getChatId();
+        String userName = getUserName(message);
+        if (botConfig.getAdmin().equals(message.getChat().getUserName())) {
+            processAdminCommands(message, chatId, userName);
+        } else {
+            var answer = nonCommand.nonCommandExecute(message, userName);
+            setAnswer(chatId, userName, answer);
+        }
 
+
+    }
+
+    private void processAdminCommands(Message message, Long chatId, String userName) {
+        var adminText = message.getText();
+        if (adminText.equals("/count")) {
+            var count = linkedInAccountService.countUsers() + " users registered";
+            setAnswer(chatId, userName, count);
+            return;
+        }
+        if (adminText.startsWith(botConfig.getPassToSay())) {
+            var adminMessageEvent = new AdminMessageEvent(this, adminText.replace(botConfig.getPassToSay(), ""));
+            applicationEventPublisher.publishEvent(adminMessageEvent);
+            return;
+        }
+        var answer = nonCommand.nonCommandExecute(message, userName);
+        setAnswer(chatId, userName, answer);
     }
 
     /**
      * Формирование имени пользователя
+     *
      * @param msg сообщение
      */
     private String getUserName(Message msg) {
