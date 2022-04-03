@@ -21,7 +21,6 @@ public class LinkedInProfile {
     private String tgUser;
     private String linkedInUrl;
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

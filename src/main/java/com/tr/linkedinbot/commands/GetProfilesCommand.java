@@ -1,7 +1,7 @@
 package com.tr.linkedinbot.commands;
 
-import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_LOAD_ACC_FIRST_MESSAGE_TEXT;
-import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_NO_USERS_MESSAGE_TEXT;
+import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_LOAD_ACC_FIRST_MESSAGE;
+import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_NO_USERS_MESSAGE;
 import com.tr.linkedinbot.config.LinkedInBotConfig;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.model.LinkedInProfile;
@@ -38,18 +38,18 @@ public class GetProfilesCommand extends ServiceCommand {
                 String.format("%s %s", chat.getLastName(), chat.getFirstName());
         boolean userLoadedHisProfile = linkedInAccountService.validateUpload(chat.getId(), userName);
         if (!userLoadedHisProfile) {
-            getProfilesMessage = GET_PROFILES_LOAD_ACC_FIRST_MESSAGE_TEXT;
+            getProfilesMessage = GET_PROFILES_LOAD_ACC_FIRST_MESSAGE.getText();
         } else {
             getProfilesMessage = getProfiles(chat, userName);
         }
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, getProfilesMessage);
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, getProfilesMessage, GET_PROFILES_LOAD_ACC_FIRST_MESSAGE.getParseMode());
     }
 
     private String getProfiles(Chat chat, String userName) {
         String getProfilesMessage;
         var linkedInProfiles = linkedInAccountService.loadRandomRecords(chat.getId(), userName, config.getRandomLimit());
         if (linkedInProfiles.isEmpty()) {
-            getProfilesMessage = GET_PROFILES_NO_USERS_MESSAGE_TEXT;
+            getProfilesMessage = GET_PROFILES_NO_USERS_MESSAGE.getText();
         } else {
             var response = linkedInProfiles.stream().map(LinkedInProfile::getLinkedInUrl).collect(Collectors.joining("\n\n\uD83D\uDE80"));
             getProfilesMessage = "\uD83D\uDE80" + response + "\n\nWith Love TR++\uD83D\uDE09";

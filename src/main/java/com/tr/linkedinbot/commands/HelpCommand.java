@@ -1,6 +1,6 @@
 package com.tr.linkedinbot.commands;
 
-import static com.tr.linkedinbot.commands.TextConstants.HELP_MESSAGE_TEXT;
+import static com.tr.linkedinbot.commands.TextConstants.HELP_MESSAGE;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -14,7 +14,7 @@ public class HelpCommand extends ServiceCommand {
         Chat chat = message.getChat();
         String userName = (chat.getUserName() != null) ? chat.getUserName() :
                 String.format("%s %s", chat.getLastName(), chat.getFirstName());
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, HELP_MESSAGE_TEXT);
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), userName, HELP_MESSAGE.getText(), HELP_MESSAGE.getParseMode());
     }
 
     @Override

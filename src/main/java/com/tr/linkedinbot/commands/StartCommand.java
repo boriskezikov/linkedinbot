@@ -1,7 +1,7 @@
 package com.tr.linkedinbot.commands;
 
 
-import static com.tr.linkedinbot.commands.TextConstants.START_MESSAGE_TEXT;
+import static com.tr.linkedinbot.commands.TextConstants.START_MESSAGE;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -14,7 +14,7 @@ public class StartCommand extends ServiceCommand {
         var chat = message.getChat();
         String userName = (chat.getUserName() != null) ? chat.getUserName() :
                 String.format("%s %s", chat.getLastName(), chat.getFirstName());
-        sendAnswer(absSender, chat.getId(), getCommandIdentifier(), userName, START_MESSAGE_TEXT);
+        sendAnswer(absSender, chat.getId(), getCommandIdentifier(), userName, START_MESSAGE.getText(), START_MESSAGE.getParseMode());
     }
 
 
