@@ -25,14 +25,13 @@ public abstract class ServiceCommand implements IBotCommand {
     /**
      * Отправка ответа пользователю
      */
-    public void sendAnswer(AbsSender absSender, Long chatId, String commandName, String userName, String text) {
+    public void sendAnswer(AbsSender absSender, Long chatId, String commandName, String userName, String text, String parseMode) {
         SendMessage message = new SendMessage();
         //включаем поддержку режима разметки, чтобы управлять отображением текста и добавлять эмодзи
         message.enableMarkdown(true);
         message.setChatId(chatId.toString());
         message.setText(text);
-        message.setProtectContent(true);
-        message.setParseMode("html");
+        message.setParseMode(parseMode);
         if (userName.equals(admin)) {
             message.setReplyMarkup(getAdminKeyboard());
         } else {

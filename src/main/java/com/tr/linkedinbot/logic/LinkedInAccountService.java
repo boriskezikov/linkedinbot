@@ -1,7 +1,7 @@
 package com.tr.linkedinbot.logic;
 
-import static com.tr.linkedinbot.commands.TextConstants.INVALID_LINKEDIN_LINK_ERROR_TEXT;
-import static com.tr.linkedinbot.commands.TextConstants.PROFILE_ALREADY_SAVED_ERROR_TEXT;
+import static com.tr.linkedinbot.commands.TextConstants.INVALID_LINKEDIN_LINK_ERROR_MESSAGE;
+import static com.tr.linkedinbot.commands.TextConstants.PROFILE_ALREADY_SAVED_ERROR_MESSAGE;
 import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
 import com.tr.linkedinbot.model.LinkedInProfile;
 import com.tr.linkedinbot.notifications.LinkedInProfileCreateEvent;
@@ -32,25 +32,30 @@ public class LinkedInAccountService {
     public void createNewProfile(Message message, String username) {
         Optional<LinkedInProfile> byId = linkedInProfileRepository.findById(message.getChatId());
         if (byId.isPresent()) {
-            throw new IllegalLinkedInProfileException(PROFILE_ALREADY_SAVED_ERROR_TEXT);
+            throw new IllegalLinkedInProfileException(PROFILE_ALREADY_SAVED_ERROR_MESSAGE.getText());
         }
-        var text = message.getText();
-        var linkedInValidUrlPattern = compile("((https?:\\/\\/)?((www|\\w\\w)\\.)?linkedin\\.com\\/)((([\\w]{2,3})?)|([^\\/]+\\/(([\\w|\\d-&#?=])+\\/?){1,}))$");
-        boolean matches = linkedInValidUrlPattern.matcher(text).matches();
-        if (!matches) {
-            throw new IllegalLinkedInProfileException(INVALID_LINKEDIN_LINK_ERROR_TEXT);
-        }
+        var validUrl = checkValid(message.getText());
+
         LinkedInProfile newProfile = LinkedInProfile.builder()
                 .chatId(message.getChatId())
-                .linkedInUrl(text)
+                .linkedInUrl(validUrl)
                 .tgUser(username).build();
 
         linkedInProfileRepository.save(newProfile);
 
-        log.info(">>> new member added {}", text);
+        log.info(">>> new member added {}", validUrl);
 
         var event = new LinkedInProfileCreateEvent(this, newProfile);
         applicationEventPublisher.publishEvent(event);
+    }
+
+    private String checkValid(String linkedInUrl) {
+        var linkedInValidUrlPattern = compile("((https?:\\/\\/)?((www|\\w\\w)\\.)?linkedin\\.com\\/)((([\\w]{2,3})?)|([^\\/]+\\/(([\\w|\\d-&#?=])+\\/?){1,}))$");
+        boolean matches = linkedInValidUrlPattern.matcher(linkedInUrl).matches();
+        if (!matches) {
+            throw new IllegalLinkedInProfileException(INVALID_LINKEDIN_LINK_ERROR_MESSAGE.getText());
+        }
+        return linkedInUrl.replace("/mwlite", "");
     }
 
     public List<LinkedInProfile> loadAll() {

@@ -1,6 +1,6 @@
 package com.tr.linkedinbot.notifications;
 
-import static com.tr.linkedinbot.commands.TextConstants.NEW_PROFILE_NOTIFICATION_MESSAGE_TEXT;
+import static com.tr.linkedinbot.commands.TextConstants.NEW_PROFILE_NOTIFICATION_MESSAGE_MESSAGE;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.LinkedInBot;
 import com.tr.linkedinbot.model.LinkedInProfile;
@@ -39,7 +39,7 @@ public class NewUserRegisteredListener implements ApplicationListener<LinkedInPr
     private SendMessage getSendMessage(LinkedInProfileCreateEvent event, LinkedInProfile linkedInProfile) {
         SendMessage sm = new SendMessage();
         sm.setChatId(linkedInProfile.getChatId().toString());
-        sm.setText(NEW_PROFILE_NOTIFICATION_MESSAGE_TEXT + event.getLinkedInProfile().getLinkedInUrl());
+        sm.setText(NEW_PROFILE_NOTIFICATION_MESSAGE_MESSAGE.getText() + event.getLinkedInProfile().getLinkedInUrl());
         return sm;
     }
 }

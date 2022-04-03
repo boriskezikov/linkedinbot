@@ -1,6 +1,10 @@
 spring:
   application:
     name: linkedin-bot
+  liquibase:
+    change-log: 'classpath:db-migrations/changelog.xml'
+    user: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
   datasource:
     url: "jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?currentSchema=${DATABASE_SCHEMA}"
     username: ${DATABASE_USERNAME}
@@ -9,7 +13,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
       dialect: org.hibernate.dialect.PostgreSQL9Dialect
       show_sql: true
     properties.hibernate.temp.use_jdbc_metadata_defaults: false
