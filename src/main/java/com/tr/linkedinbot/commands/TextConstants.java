@@ -19,7 +19,7 @@ public enum TextConstants {
             "Кидай ссылку на свой профиль, и я поделюсь с тобой контактами\\!\n\n" +
             "Вот пример рабочей ссылки: `https://www\\.linkedin\\.com/in/boriskezikov/`\n" +
             "Если что\\-то идет не так, пиши @kezik\\_off, он прикрутит костыль\uD83D\uDE09" +
-            "\n\nWith Love TR\\+\\+\uD83D\uDE09", ParseMode.MARKDOWNV2),
+            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.MARKDOWNV2),
 
 
     DONT_UNDERSTAND_GLOBAL_ERROR_MESSAGE("Простите, я не понимаю Вас. Возможно, Вам поможет /help\n" +
