@@ -10,10 +10,10 @@ public enum TextConstants {
 
 
     GET_PROFILES_LOAD_ACC_FIRST_MESSAGE("По нашим правилам, сначала ты грузишь свой профиль, а потом мы покажем тебе чужие\n" +
-            "\n\nWith Love TR++\uD83D\uDE09", ParseMode.HTML),
+            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
     GET_PROFILES_NO_USERS_MESSAGE("Нам пока нечего тебе показать( Пингани ребят в чате, чтоб грузили свои профили!\n" +
-            "\n\nWith Love TR++\uD83D\uDE09", ParseMode.HTML),
+            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
     HELP_MESSAGE("Я помогу обзавестить коннектами с участниками нашего сообщества в LinkedIn\\!\n" +
             "Кидай ссылку на свой профиль, и я поделюсь с тобой контактами\\!\n\n" +
@@ -23,16 +23,16 @@ public enum TextConstants {
 
 
     DONT_UNDERSTAND_GLOBAL_ERROR_MESSAGE("Простите, я не понимаю Вас. Возможно, Вам поможет /help\n" +
-            "\n\nWith Love TR++\uD83D\uDE09", ParseMode.HTML),
+            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
     PROFILE_SAVED_MESSAGE("Сохранил твой профиль. Можешь приступать к добавлению новых контактов.\n" +
-            "\n\nWith Love TR++\uD83D\uDE09", ParseMode.HTML),
+            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
     START_MESSAGE("Прежде чем начнём, я расскажу, как это работает!" +
             "\n\nКоманда /get_next_profiles позволяет получить список 10 случайных профилей в системе, что удобно, если ты только присоединился.\n\nВыполняй команду, добавляй в друзья, а дальше бот сам будет рассылать уведомления о новых профилях!" +
             "\n\nПрисылай ссылку на свой профиль в формате https://www.linkedin.com/in/...  и поехали!" +
             "\n\nОтправляя нам ссылку на свой профиль, ты даешь согласие на обработку и хранение персональных данных." +
-            "\n\nWith Love TR++\uD83D\uDE09", ParseMode.HTML),
+            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
     PROFILE_ALREADY_SAVED_ERROR_MESSAGE("Ты уже загрузил профиль, большего не нужно :)", ParseMode.HTML),
 

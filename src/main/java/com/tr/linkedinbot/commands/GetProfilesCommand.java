@@ -52,7 +52,7 @@ public class GetProfilesCommand extends ServiceCommand {
             getProfilesMessage = GET_PROFILES_NO_USERS_MESSAGE.getText();
         } else {
             var response = linkedInProfiles.stream().map(LinkedInProfile::getLinkedInUrl).collect(Collectors.joining("\n\n\uD83D\uDE80"));
-            getProfilesMessage = "\uD83D\uDE80" + response + "\n\nWith Love TR++\uD83D\uDE09";
+            getProfilesMessage = "\uD83D\uDE80" + response + "\n\nWith love from Israel HiTech\uD83D\uDE09";
         }
         return getProfilesMessage;
     }
