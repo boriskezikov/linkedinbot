@@ -13,11 +13,15 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class LinkedInAccountService {
 
@@ -35,14 +39,15 @@ public class LinkedInAccountService {
             throw new IllegalLinkedInProfileException(PROFILE_ALREADY_SAVED_ERROR_MESSAGE.getText());
         }
         var validUrl = checkValid(message.getText());
-
+        var chatId = message.getChatId();
         LinkedInProfile newProfile = LinkedInProfile.builder()
-                .chatId(message.getChatId())
+                .chatId(chatId)
                 .linkedInUrl(validUrl)
+                .lastProfileGet(LocalDateTime.now().minusYears(1))
                 .tgUser(username).build();
 
         linkedInProfileRepository.save(newProfile);
-
+        linkedInProfileRepository.writeShownChatId(chatId, chatId);
         log.info(">>> new member added {}", validUrl);
 
         var event = new LinkedInProfileCreateEvent(this, newProfile);
@@ -67,10 +72,32 @@ public class LinkedInAccountService {
         removeRequester(all, tgName, chatId);
         return all;
     }
+    //TODO: Это зачатки биллинга.
+    // Пока проверяем только время последнего запроса и советвуем сделать донат.
+    // Когда будет мерчант, можно строго проверять оплату.
+    public boolean checkRequesterBillingTime(Long chatId, String tgName) {
+        log.info("Check requester billing {} {}", chatId, tgName);
+
+        LinkedInProfile p = linkedInProfileRepository.getById(chatId);
+        return LocalDateTime.now().isAfter(p.getLastProfileGet().plusMinutes(2));
+    }
+
+    public boolean checkRequesterLoadSize(Long chatId, String tgName) {
+        log.info("Check requester load size {} {}", chatId, tgName);
+
+        Long l = linkedInProfileRepository.selectRequesterLoadSize(chatId);
+        return l <= 20;
+    }
 
     public List<LinkedInProfile> loadRandomRecords(Long chatId, String tgName, int limit) {
-        var all = linkedInProfileRepository.selectRandom(limit);
-        removeRequester(all, tgName, chatId);
+        log.info("Loading profiles for {} {}", chatId, tgName);
+
+        var all = linkedInProfileRepository.selectRandomForRequester(chatId, limit);
+        all.forEach(l -> linkedInProfileRepository.writeShownChatId(chatId, l.getChatId()));
+
+        if(all.size() > 0)
+            updateLastGetDate(chatId);
+
         return all;
     }
 
@@ -82,5 +109,11 @@ public class LinkedInAccountService {
 
     public boolean validateUpload(Long chatId, String tgName) {
         return linkedInProfileRepository.existsByChatIdOrTgUser(chatId, tgName);
+    }
+
+    private void updateLastGetDate(Long chatId) {
+        LinkedInProfile p = linkedInProfileRepository.getById(chatId);
+        p.setLastProfileGet(LocalDateTime.now());
+        linkedInProfileRepository.save(p);
     }
 }

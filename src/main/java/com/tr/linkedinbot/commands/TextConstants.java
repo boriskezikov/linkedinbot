@@ -40,8 +40,26 @@ public enum TextConstants {
 
     NEW_PROFILE_NOTIFICATION_MESSAGE_MESSAGE("Новый профиль! Добавляй в друзья: ", ParseMode.HTML),
 
-    ADMIN_MESSAGE("От админов\n", ParseMode.HTML);
+    ADMIN_MESSAGE("От админов\n", ParseMode.HTML),
 
+    NEED_PAY_MESSAGE("Запрашивать профили можно один раз в две минуты." +
+            "\n\nСкоро для снятия ограничений будет требоваться обязательная оплата. " +
+            "\n\nМы тратим средства волонтёров на поддержку этого проекта." +
+            "\n\nА пока подумай о донате: "   +
+            "\n\nBTC: 1G44444444 "   +
+            "\n\nETH: 0x555555555 "   +
+            "\n\nUSDT (TRC20): 0x66666666"
+            , ParseMode.HTML),
+
+
+    NEED_PAY_SIZE_MESSAGE("Ты уже получил более 20 профилей, а нам приходится бороться со спаммерами!  " +
+                             "\n\nСкоро для снятия ограничений будет требоваться обязательная оплата. " +
+                             "\n\nМы тратим средства волонтёров на поддержку этого проекта." +
+                             "\n\nА пока подумай о донате: "   +
+                             "\n\nBTC: 1G44444444 "   +
+                             "\n\nETH: 0x555555555 "   +
+                             "\n\nUSDT (TRC20): 0x66666666"
+                             , ParseMode.HTML);
 
     private final String text;
     private final String parseMode;

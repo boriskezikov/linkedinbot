@@ -3,8 +3,9 @@ package com.tr.linkedinbot.model;
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.Entity;
+ import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -20,6 +21,7 @@ public class LinkedInProfile {
     private Long chatId;
     private String tgUser;
     private String linkedInUrl;
+    private LocalDateTime lastProfileGet;
 
     @Override
     public boolean equals(Object o) {
