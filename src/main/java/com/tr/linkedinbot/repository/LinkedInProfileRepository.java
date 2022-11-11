@@ -21,7 +21,6 @@ public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile
     @Query(value = "select * from linked_in_profile where to_remove = 'false' order by random() limit :#{#limit}", nativeQuery = true)
     List<LinkedInProfile> selectRandom(@Param(value = "limit") @Valid Integer limit);
 
-    @Transactional
     @Query(value = "with t as (select unnest(i.showed_ids) as ids from linked_in_profile i where i.chat_id = :chatId) " +
             "select p.* " +
             "from linked_in_profile p, t " +
@@ -32,14 +31,12 @@ public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile
     List<LinkedInProfile> selectRandomForRequester(@Param(value = "chatId") Long chatId, @Param(value = "limit") @Valid Integer limit);
 
     @Modifying
-    @Transactional
-    @Query(value = "update linked_in_profile set showed_ids = ARRAY_APPEND(showed_ids, :shownId) where chat_id = :hostId", nativeQuery = true)
-    void writeShownChatId(@Param(value = "hostId") Long chatId,
-                          @Param(value = "shownId") Long shownId);
+    @Query(value = "update linked_in_profile set last_profile_get = now(), " +
+            " showed_ids = ARRAY_APPEND(showed_ids, :shownId) where chat_id = :chatId", nativeQuery = true)
+    void writeShownChatId(@Param(value = "chatId") Long chatId,
+                          @Param(value = "shownId") Long shownChatId);
 
-
-
-
+    
     @Query(value = "select cardinality(i.showed_ids) as ids from linked_in_profile i where i.chat_id = :chatId", nativeQuery = true)
     Long selectRequesterLoadSize(@Param(value = "chatId") Long chatId);
 

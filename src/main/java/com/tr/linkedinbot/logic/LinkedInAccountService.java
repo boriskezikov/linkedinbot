@@ -15,7 +15,6 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ public class LinkedInAccountService {
     public long countUsers() {
         return linkedInProfileRepository.count();
     }
-
+    
     public void createNewProfile(Message message, String username) {
         Optional<LinkedInProfile> byId = linkedInProfileRepository.findById(message.getChatId());
         if (byId.isPresent()) {
@@ -46,12 +45,17 @@ public class LinkedInAccountService {
                 .lastProfileGet(LocalDateTime.now().minusYears(1))
                 .tgUser(username).build();
 
-        linkedInProfileRepository.save(newProfile);
-        linkedInProfileRepository.writeShownChatId(chatId, chatId);
+        saveProfile(newProfile);
         log.info(">>> new member added {}", validUrl);
 
         var event = new LinkedInProfileCreateEvent(this, newProfile);
         applicationEventPublisher.publishEvent(event);
+    }
+
+    private void saveProfile(LinkedInProfile newProfile){
+        linkedInProfileRepository.save(newProfile);
+        //Записываем свой id в список показаных, чтобы он не попал в выдачу
+        linkedInProfileRepository.writeShownChatId(newProfile.getChatId(), newProfile.getChatId());
     }
 
     private String checkValid(String linkedInUrl) {
@@ -94,9 +98,6 @@ public class LinkedInAccountService {
 
         var all = linkedInProfileRepository.selectRandomForRequester(chatId, limit);
         all.forEach(l -> linkedInProfileRepository.writeShownChatId(chatId, l.getChatId()));
-
-        if(all.size() > 0)
-            updateLastGetDate(chatId);
 
         return all;
     }

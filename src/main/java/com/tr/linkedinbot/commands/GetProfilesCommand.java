@@ -50,10 +50,6 @@ public class GetProfilesCommand extends ServiceCommand {
         var isSizeGood = linkedInAccountService.checkRequesterLoadSize(chat.getId(), userName);
         if(!isSizeGood)
             return NEED_PAY_SIZE_MESSAGE.getText();
-
-        var isBillingGood = linkedInAccountService.checkRequesterBillingTime(chat.getId(), userName);
-        if(!isBillingGood)
-            return NEED_PAY_MESSAGE.getText();
         
         String getProfilesMessage;
         var linkedInProfiles = linkedInAccountService.loadRandomRecords(chat.getId(), userName, config.getRandomLimit());
