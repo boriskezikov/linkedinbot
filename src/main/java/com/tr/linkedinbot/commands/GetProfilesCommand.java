@@ -11,7 +11,9 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.stream.Collectors;
 
-import static com.tr.linkedinbot.commands.TextConstants.*;
+import static com.tr.linkedinbot.commands.TextConstants.NEED_PAY_SIZE_MESSAGE;
+import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_LOAD_ACC_FIRST_MESSAGE;
+import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_NO_USERS_MESSAGE;
 
 @Component
 @RequiredArgsConstructor
