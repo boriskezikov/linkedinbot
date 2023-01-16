@@ -15,15 +15,26 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LinkedInAccountService {
 
+    /*
+    "^" matches the start of the string, ensuring that the regular expression only matches URLs that start with the specified pattern.
+    "(https?://)?" is a group that matches "http://" or "https://" and is optional, meaning it can match URLs that start with "http://" or "https://" or not.
+    "(www\.)?" is a group that matches "www." and is also optional, meaning it can match URLs that contain "www." or not.
+    "linkedin\.com" matches the domain name "linkedin.com"
+    "/in" matches the string "/in"
+    ".*" matches any character (except for a newline) zero or more times.
+    "$" matches the end of the string, ensuring that the regular expression only matches URLs that end with the specified pattern.
+     */
+    public static final String REGEX = "^(https?://)?(www\\.)?linkedin\\.com/in.*$";
+    private static final Predicate<String> LINKED_IN_VALID_URL_PATTERN_PREDICATE = compile(REGEX).asMatchPredicate();
     private final LinkedInProfileRepository linkedInProfileRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
-
 
     public long countUsers() {
         return linkedInProfileRepository.count();
@@ -50,12 +61,10 @@ public class LinkedInAccountService {
     }
 
     private String checkValid(String linkedInUrl) {
-        var linkedInValidUrlPattern = compile("((https?:\\/\\/)?((www|\\w\\w)\\.)?linkedin\\.com\\/)((([\\w]{2,3})?)|([^\\/]+\\/(([\\w|\\d-&#?=])+\\/?){1,}))$");
-        boolean matches = linkedInValidUrlPattern.matcher(linkedInUrl).matches();
-        if (!matches) {
-            throw new IllegalLinkedInProfileException(INVALID_LINKEDIN_LINK_ERROR_MESSAGE.getText());
-        }
-        return linkedInUrl.replace("/mwlite", "");
+        return Optional.of(linkedInUrl)
+                .filter(LINKED_IN_VALID_URL_PATTERN_PREDICATE)
+                .map(linked -> linked.replace("/mwlite", ""))
+                .orElseThrow(() -> new IllegalLinkedInProfileException(INVALID_LINKEDIN_LINK_ERROR_MESSAGE.getText()));
     }
 
     public List<LinkedInProfile> loadAll() {
@@ -78,7 +87,6 @@ public class LinkedInAccountService {
         all.removeIf(linkedInProfile -> linkedInProfile.getTgUser().equals(tgName) ||
                 linkedInProfile.getChatId().equals(chatId));
     }
-
 
     public boolean validateUpload(Long chatId, String tgName) {
         return linkedInProfileRepository.existsByChatIdOrTgUser(chatId, tgName);
