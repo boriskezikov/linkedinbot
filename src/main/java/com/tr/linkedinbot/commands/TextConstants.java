@@ -36,7 +36,7 @@ public enum TextConstants {
 
     PROFILE_ALREADY_SAVED_ERROR_MESSAGE("Ты уже загрузил профиль, большего не нужно :)", ParseMode.HTML),
 
-    INVALID_LINKEDIN_LINK_ERROR_MESSAGE("Похоже ссылка не корректна и/или такой профиль не существует", ParseMode.HTML),
+    INVALID_LINKEDIN_LINK_ERROR_MESSAGE("Похоже ссылка некорректна/не является ссылкой на профиль/такой профиль не существует", ParseMode.HTML),
 
     NEW_PROFILE_NOTIFICATION_MESSAGE_MESSAGE("Новый профиль! Добавляй в друзья: ", ParseMode.HTML),
 
