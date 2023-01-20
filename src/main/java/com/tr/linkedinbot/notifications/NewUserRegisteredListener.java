@@ -4,6 +4,7 @@ import static com.tr.linkedinbot.commands.TextConstants.NEW_PROFILE_NOTIFICATION
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.LinkedInBot;
 import com.tr.linkedinbot.model.LinkedInProfile;
+import com.tr.linkedinbot.notifications.events.LinkedInProfileCreateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
