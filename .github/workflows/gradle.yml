@@ -43,7 +43,7 @@ jobs:
       with:
         name: JUNIT Tests            # Name of the check run which will be created
         path: build/test-results/test/    # Path to test results
-        reporter: java-Junit        # Format of test results
+        reporter: java-junit        # Format of test results
     - name: Cache Gradle
       id: cache-gradle
       uses: actions/cache@v3
