@@ -1,6 +1,6 @@
 package com.tr.linkedinbot.logic;
 
-import com.tr.linkedinbot.commands.*;
+import com.tr.linkedinbot.commands.ServiceCommand;
 import com.tr.linkedinbot.config.LinkedInBotConfig;
 import com.tr.linkedinbot.notifications.events.AnswerEvent;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
+import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 

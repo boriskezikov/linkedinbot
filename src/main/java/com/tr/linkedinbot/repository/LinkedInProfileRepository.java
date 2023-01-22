@@ -22,6 +22,6 @@ public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile
     @Query(value = "select * from linked_in_profile where to_remove = 'false' order by random() limit :#{#limit}", nativeQuery = true)
     List<LinkedInProfile> selectRandom(@Param(value = "limit") @Valid Integer limit);
 
-    Optional<LinkedInProfile> getByChatId(@Param(value = "chatId") Long chatId);
+    Optional<LinkedInProfile> getByChatId(Long chatId);
 
 }
