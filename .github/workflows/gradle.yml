@@ -42,7 +42,7 @@ jobs:
       if: success() || failure()    # run this step even if previous step failed
       with:
         name: JUNIT Tests            # Name of the check run which will be created
-        path: build/test-results/test/    # Path to test results
+        path: build/test-results/test/*.xml    # Path to test results
         reporter: java-junit        # Format of test results
     - name: Cache Gradle
       id: cache-gradle
