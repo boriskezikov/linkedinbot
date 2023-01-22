@@ -18,18 +18,20 @@ import static com.tr.linkedinbot.commands.TextConstants.ADMIN_MESSAGE;
 @RequiredArgsConstructor
 public class AnnounceCommand extends ServiceCommand {
 
+    private static final String ANNOUNCE = "announce";
+
     @Value("${bot.admin}")
     private String admin;
 
     private final LinkedInProfileRepository repository;
     @Override
     public String getCommandIdentifier() {
-        return "announce";
+        return ANNOUNCE;
     }
 
     @Override
     public String getDescription() {
-        return "announce";
+        return ANNOUNCE;
     }
 
     @Override
@@ -40,7 +42,6 @@ public class AnnounceCommand extends ServiceCommand {
             linkedInProfile.setState(BotState.ANNOUNCE);
             repository.save(linkedInProfile);
             sendAnswer(absSender, message.getChatId(), getCommandIdentifier(), userName, ADMIN_MESSAGE.getText(), ADMIN_MESSAGE.getParseMode());
-
         }
     }
 
