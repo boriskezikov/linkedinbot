@@ -9,18 +9,15 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "develop" ]
   pull_request:
-    branches: [ "master" ]
 
 permissions:
   contents: read
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 11
@@ -40,6 +37,13 @@ jobs:
       run: ./gradlew test
       env:
         GRADLE_OPTS: '-Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true'
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()    # run this step even if previous step failed
+      with:
+        name: JUNIT Tests            # Name of the check run which will be created
+        path: build/test-results/test/    # Path to test results
+        reporter: java-Junit        # Format of test results
     - name: Cache Gradle
       id: cache-gradle
       uses: actions/cache@v3
