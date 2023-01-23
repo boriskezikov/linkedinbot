@@ -1,4 +1,4 @@
-package com.tr.linkedinbot.notifications;
+package com.tr.linkedinbot.notifications.events;
 
 import com.tr.linkedinbot.model.LinkedInProfile;
 import lombok.Getter;

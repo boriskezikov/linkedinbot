@@ -51,8 +51,7 @@ public abstract class ServiceCommand implements IBotCommand {
 
         KeyboardRow row2 = new KeyboardRow();
         row2.add(new KeyboardButton(ButtonNameEnum.ADMIN_COUNT.getButtonName()));
-//        row2.add(new KeyboardButton(ButtonNameEnum.ADMIN_MESSAGE.getButtonName()));
-
+        row2.add(new KeyboardButton(ButtonNameEnum.ADMIN_MESSAGE.getButtonName()));
 
         List<KeyboardRow> keyboard = new ArrayList<>();
         keyboard.add(row1);
