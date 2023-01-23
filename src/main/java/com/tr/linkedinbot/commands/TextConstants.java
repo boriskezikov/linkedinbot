@@ -42,7 +42,11 @@ public enum TextConstants {
 
     ADMIN_MESSAGE("Напиши текст для объявления\n", ParseMode.HTML),
 
-    ADMIN_INTRODUCTION("‼️Сообщение от админов‼️:\n", ParseMode.HTML);
+    ADMIN_INTRODUCTION("‼️Сообщение от админов‼️:\n", ParseMode.HTML),
+
+    NEW_LINK_MESSAGE("Напиши новую ссылку:\n", ParseMode.HTML),
+
+    LINK_CHANGED_MESSAGE("Ссылка успешно изменена\uD83E\uDD73\n", ParseMode.HTML);
 
     private final String text;
     private final String parseMode;
