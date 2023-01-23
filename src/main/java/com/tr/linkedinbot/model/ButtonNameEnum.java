@@ -8,7 +8,8 @@ public enum ButtonNameEnum {
     CHANGE_LINK("/change_link"),
     GET_PROFILES("/get_profiles"),
     GET_NEXT_PROFILES("/get_next_profiles"),
-    HELP("/help");
+    HELP("/help"),
+    FEEDBACK("/feedback");
 
     private final String buttonName;
 

@@ -14,10 +14,9 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 public class CountCommand extends ServiceCommand {
 
     private static final String COUNT = "count";
-
     private final LinkedInAccountService linkedInAccountService;
 
-    @Value("${bot.admin}")
+    @Value("${bot.admin.name}")
     private String admin;
     @Override
     public String getCommandIdentifier() {

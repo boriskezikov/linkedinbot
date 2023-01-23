@@ -44,6 +44,10 @@ public enum TextConstants {
 
     ADMIN_INTRODUCTION("‼️Сообщение от админов‼️:\n", ParseMode.HTML),
 
+    FEEDBACK("Напиши ниже, чтобы ты хотел передать разработчикам: предложения по новым фичам, сообщение о багах или просто благодарности\uD83D\uDE0A\nМы все читаем и ко всему прислушиваемся!", ParseMode.HTML),
+
+    FEEDBACK_SENT("Твое сообщение передано разрабам, большое спасибо за предоставленный фидбек\uD83D\uDE0C\n", ParseMode.HTML),
+
     NEW_LINK_MESSAGE("Напиши новую ссылку:\n", ParseMode.HTML),
 
     LINK_CHANGED_MESSAGE("Ссылка успешно изменена\uD83E\uDD73\n", ParseMode.HTML);
