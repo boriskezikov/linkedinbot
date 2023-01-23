@@ -5,6 +5,7 @@ public enum ButtonNameEnum {
     ADD_PROFILE("/add_profile"),
     ADMIN_COUNT("/count"),
     ADMIN_MESSAGE("/announce"),
+    CHANGE_LINK("/change_link"),
     GET_PROFILES("/get_profiles"),
     GET_NEXT_PROFILES("/get_next_profiles"),
     HELP("/help");
