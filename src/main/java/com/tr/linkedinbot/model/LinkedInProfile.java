@@ -4,6 +4,8 @@ import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import java.util.Objects;
 
@@ -18,8 +20,13 @@ public class LinkedInProfile {
 
     @Id
     private Long chatId;
+
     private String tgUser;
+
     private String linkedInUrl;
+
+    @Enumerated(EnumType.STRING)
+    private BotState state;
 
     @Override
     public boolean equals(Object o) {
@@ -31,6 +38,7 @@ public class LinkedInProfile {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return chatId.hashCode();
     }
+
 }

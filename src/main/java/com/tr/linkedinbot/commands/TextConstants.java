@@ -40,8 +40,9 @@ public enum TextConstants {
 
     NEW_PROFILE_NOTIFICATION_MESSAGE_MESSAGE("Новый профиль! Добавляй в друзья: ", ParseMode.HTML),
 
-    ADMIN_MESSAGE("От админов\n", ParseMode.HTML);
+    ADMIN_MESSAGE("Напиши текст для объявления\n", ParseMode.HTML),
 
+    ADMIN_INTRODUCTION("‼️Сообщение от админов‼️:\n", ParseMode.HTML);
 
     private final String text;
     private final String parseMode;

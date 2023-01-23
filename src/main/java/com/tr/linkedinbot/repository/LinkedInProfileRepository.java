@@ -1,5 +1,6 @@
 package com.tr.linkedinbot.repository;
 
+import com.tr.linkedinbot.model.BotState;
 import com.tr.linkedinbot.model.LinkedInProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile, Long> {
@@ -19,4 +21,7 @@ public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile
     @Transactional
     @Query(value = "select * from linked_in_profile where to_remove = 'false' order by random() limit :#{#limit}", nativeQuery = true)
     List<LinkedInProfile> selectRandom(@Param(value = "limit") @Valid Integer limit);
+
+    Optional<LinkedInProfile> getByChatId(Long chatId);
+
 }

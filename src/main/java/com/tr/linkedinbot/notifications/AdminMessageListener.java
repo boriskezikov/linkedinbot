@@ -1,9 +1,11 @@
 package com.tr.linkedinbot.notifications;
 
+import static com.tr.linkedinbot.commands.TextConstants.ADMIN_INTRODUCTION;
 import static com.tr.linkedinbot.commands.TextConstants.ADMIN_MESSAGE;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.LinkedInBot;
 import com.tr.linkedinbot.model.LinkedInProfile;
+import com.tr.linkedinbot.notifications.events.AdminMessageEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -39,7 +41,7 @@ public class AdminMessageListener implements ApplicationListener<AdminMessageEve
     private SendMessage getSendMessage(LinkedInProfile linkedInProfile, String adminMessage) {
         SendMessage sm = new SendMessage();
         sm.setChatId(linkedInProfile.getChatId().toString());
-        sm.setText(ADMIN_MESSAGE + adminMessage);
+        sm.setText(ADMIN_INTRODUCTION.getText() + adminMessage);
         return sm;
     }
 }
