@@ -19,8 +19,7 @@ import static com.tr.linkedinbot.commands.TextConstants.ADMIN_MESSAGE;
 public class AnnounceCommand extends ServiceCommand {
 
     private static final String ANNOUNCE = "announce";
-
-    @Value("${bot.admin}")
+    @Value("${bot.admin.name}")
     private String admin;
 
     private final LinkedInProfileRepository repository;

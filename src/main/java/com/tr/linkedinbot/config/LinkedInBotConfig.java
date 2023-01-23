@@ -14,11 +14,8 @@ public class LinkedInBotConfig {
     @Value("${bot.token}")
     private String token;
 
-    @Value("${bot.admin}")
+    @Value("${bot.admin.name}")
     private String admin;
-
-    @Value("${bot.pass}")
-    private String passToSay;
 
     @Value("${bot.random.limit}")
     private Integer randomLimit;

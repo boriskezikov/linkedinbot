@@ -8,6 +8,7 @@ import com.tr.linkedinbot.model.BotState;
 import com.tr.linkedinbot.notifications.events.AnswerEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Component

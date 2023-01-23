@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 public abstract class ServiceCommand implements IBotCommand {
 
-    @Value("${bot.admin}")
+    @Value("${bot.admin.name}")
     private String admin;
 
     /**
@@ -72,6 +72,7 @@ public abstract class ServiceCommand implements IBotCommand {
 
         KeyboardRow row2 = new KeyboardRow();
         row2.add(new KeyboardButton(ButtonNameEnum.HELP.getButtonName()));
+        row2.add(new KeyboardButton(ButtonNameEnum.FEEDBACK.getButtonName()));
         row2.add(new KeyboardButton(ButtonNameEnum.CHANGE_LINK.getButtonName()));
 
 

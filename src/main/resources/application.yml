@@ -22,8 +22,9 @@ spring:
 bot:
   name: ${BOT_NAME}
   token: ${BOT_TOKEN}
-  admin: ${ADMIN_NICKNAME}
-  pass: ${ADMIN_PASS}
+  admin:
+    name: ${ADMIN_NICKNAME}
+    chatId: ${ADMIN_CHATID}
   random:
     limit: ${BOT_RANDOM_LIMIT}
 
