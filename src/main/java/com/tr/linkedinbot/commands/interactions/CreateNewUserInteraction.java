@@ -4,11 +4,11 @@ import static com.tr.linkedinbot.commands.TextConstants.DONT_UNDERSTAND_GLOBAL_E
 import static com.tr.linkedinbot.commands.TextConstants.PROFILE_SAVED_MESSAGE;
 import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
+import com.tr.linkedinbot.logic.MetricSender;
 import com.tr.linkedinbot.model.BotState;
 import com.tr.linkedinbot.notifications.events.AnswerEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Component
@@ -16,8 +16,12 @@ public class CreateNewUserInteraction extends AbstractInteraction {
 
     private final LinkedInAccountService accountParser;
 
-    public CreateNewUserInteraction(LinkedInAccountService accountParser, ApplicationEventPublisher publisher) {
-        super(publisher);
+    public CreateNewUserInteraction(
+            LinkedInAccountService accountParser,
+            ApplicationEventPublisher publisher,
+            MetricSender metricSender
+    ) {
+        super(publisher, metricSender);
         this.accountParser = accountParser;
     }
 
@@ -27,6 +31,9 @@ public class CreateNewUserInteraction extends AbstractInteraction {
         String userName = getUserName(message);
         try {
             accountParser.createNewProfile(message, userName);
+
+            metricSender.registerNewUserEvent(message);
+
             answer = PROFILE_SAVED_MESSAGE.getText();
         } catch (IllegalLinkedInProfileException e) {
                 answer =  e.getMessage();
