@@ -2,9 +2,15 @@ package com.tr.linkedinbot.commands;
 
 import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_LOAD_ACC_FIRST_MESSAGE;
 import static com.tr.linkedinbot.commands.TextConstants.GET_PROFILES_NO_USERS_MESSAGE;
+import static com.tr.linkedinbot.model.CommandEnum.*;
+
 import com.tr.linkedinbot.config.LinkedInBotConfig;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
+import com.tr.linkedinbot.logic.MetricSender;
+import com.tr.linkedinbot.model.CommandEnum;
 import com.tr.linkedinbot.model.LinkedInProfile;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -18,24 +24,26 @@ import java.util.stream.Collectors;
 public class GetProfilesCommand extends ServiceCommand {
 
     private final LinkedInAccountService linkedInAccountService;
+    private final MetricSender metricSender;
     private final LinkedInBotConfig config;
 
     @Override
     public String getCommandIdentifier() {
-        return "get_next_profiles";
+        return GET_NEXT_PROFILES.getName();
     }
 
     @Override
     public String getDescription() {
-        return "Загрузить 10 следующий профилей";
+        return GET_NEXT_PROFILES.getDescription();
     }
 
     @Override
     public void processMessage(AbsSender absSender, Message message, String[] arguments) {
+        metricSender.registerCommandUse(GET_NEXT_PROFILES, message);
+        
         String getProfilesMessage;
-        Chat chat = message.getChat();
-        var userName = (chat.getUserName() != null) ? chat.getUserName() :
-                String.format("%s %s", chat.getLastName(), chat.getFirstName());
+        var chat = message.getChat();
+        var userName = getUsername(chat);
         boolean userLoadedHisProfile = linkedInAccountService.validateUpload(chat.getId(), userName);
         if (!userLoadedHisProfile) {
             getProfilesMessage = GET_PROFILES_LOAD_ACC_FIRST_MESSAGE.getText();

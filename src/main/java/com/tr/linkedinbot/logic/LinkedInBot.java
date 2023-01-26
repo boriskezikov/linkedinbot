@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -32,7 +33,14 @@ public class LinkedInBot extends TelegramLongPollingCommandBot {
 
     @Override
     public void processNonCommandUpdate(Update update) {
-        interactionManager.processMessage(update.getMessage());
+        if (!filter(update.getMessage())) {
+            interactionManager.processMessage(update.getMessage());
+        }
+    }
+
+    @Override
+    protected boolean filter(Message message) {
+        return message.getChat().isGroupChat();
     }
 
     @EventListener
