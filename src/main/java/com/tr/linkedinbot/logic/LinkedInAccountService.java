@@ -3,8 +3,9 @@ package com.tr.linkedinbot.logic;
 import static com.tr.linkedinbot.commands.TextConstants.INVALID_LINKEDIN_LINK_ERROR_MESSAGE;
 import static com.tr.linkedinbot.commands.TextConstants.PROFILE_ALREADY_SAVED_ERROR_MESSAGE;
 import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
+import com.tr.linkedinbot.model.BotState;
 import com.tr.linkedinbot.model.LinkedInProfile;
-import com.tr.linkedinbot.notifications.LinkedInProfileCreateEvent;
+import com.tr.linkedinbot.notifications.events.LinkedInProfileCreateEvent;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import static java.util.regex.Pattern.compile;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,9 @@ public class LinkedInAccountService {
         LinkedInProfile newProfile = LinkedInProfile.builder()
                 .chatId(message.getChatId())
                 .linkedInUrl(validUrl)
-                .tgUser(username).build();
+                .tgUser(username)
+                .state(BotState.NOT_IN_INTERACTION)
+                .build();
 
         linkedInProfileRepository.save(newProfile);
 
@@ -60,7 +63,7 @@ public class LinkedInAccountService {
         applicationEventPublisher.publishEvent(event);
     }
 
-    private String checkValid(String linkedInUrl) {
+    public static String checkValid(String linkedInUrl) {
         return Optional.of(linkedInUrl)
                 .filter(LINKED_IN_VALID_URL_PATTERN_PREDICATE)
                 .map(linked -> linked.replace("/mwlite", ""))
@@ -69,12 +72,6 @@ public class LinkedInAccountService {
 
     public List<LinkedInProfile> loadAll() {
         return linkedInProfileRepository.findAll();
-    }
-
-    public List<LinkedInProfile> loadAll(Long chatId, String tgName) {
-        var all = linkedInProfileRepository.findAll();
-        removeRequester(all, tgName, chatId);
-        return all;
     }
 
     public List<LinkedInProfile> loadRandomRecords(Long chatId, String tgName, int limit) {

@@ -1,4 +1,4 @@
-package com.tr.linkedinbot.notifications;
+package com.tr.linkedinbot.notifications.events;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

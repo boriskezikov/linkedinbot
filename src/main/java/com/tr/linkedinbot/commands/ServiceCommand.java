@@ -1,12 +1,16 @@
 package com.tr.linkedinbot.commands;
 
 import com.tr.linkedinbot.model.ButtonNameEnum;
+import io.micrometer.core.instrument.Counter;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -19,7 +23,7 @@ import java.util.List;
 @Getter
 public abstract class ServiceCommand implements IBotCommand {
 
-    @Value("${bot.admin}")
+    @Value("${bot.admin.name}")
     private String admin;
 
     /**
@@ -51,8 +55,7 @@ public abstract class ServiceCommand implements IBotCommand {
 
         KeyboardRow row2 = new KeyboardRow();
         row2.add(new KeyboardButton(ButtonNameEnum.ADMIN_COUNT.getButtonName()));
-//        row2.add(new KeyboardButton(ButtonNameEnum.ADMIN_MESSAGE.getButtonName()));
-
+        row2.add(new KeyboardButton(ButtonNameEnum.ADMIN_MESSAGE.getButtonName()));
 
         List<KeyboardRow> keyboard = new ArrayList<>();
         keyboard.add(row1);
@@ -73,6 +76,8 @@ public abstract class ServiceCommand implements IBotCommand {
 
         KeyboardRow row2 = new KeyboardRow();
         row2.add(new KeyboardButton(ButtonNameEnum.HELP.getButtonName()));
+        row2.add(new KeyboardButton(ButtonNameEnum.FEEDBACK.getButtonName()));
+        row2.add(new KeyboardButton(ButtonNameEnum.CHANGE_LINK.getButtonName()));
 
 
         List<KeyboardRow> keyboard = new ArrayList<>();
@@ -87,4 +92,10 @@ public abstract class ServiceCommand implements IBotCommand {
 
         return replyKeyboardMarkup;
     }
+
+    public String getUsername(Chat chat) {
+        return (chat.getUserName() != null) ? chat.getUserName() :
+                String.format("%s %s", chat.getLastName(), chat.getFirstName());
+    }
+
 }

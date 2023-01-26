@@ -23,7 +23,8 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.6.5'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.10.3'
     implementation 'org.telegram:telegrambots-spring-boot-starter:5.7.1'
 
     implementation 'org.projectlombok:lombok'
@@ -40,6 +41,16 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.withType(Test).configureEach {
+    def outputDir = reports.junitXml.outputLocation
+    jvmArgumentProviders << ({
+        [
+                "-Djunit.platform.reporting.open.xml.enabled=true",
+                "-Djunit.platform.reporting.output.dir=${outputDir.get().asFile.absolutePath}"
+        ]
+    } as CommandLineArgumentProvider)
 }
 
 jar {
