@@ -1,8 +1,8 @@
 package com.tr.linkedinbot.commands.interactions;
 
+import com.tr.linkedinbot.logic.MetricSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.ForwardMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -15,8 +15,11 @@ public abstract class AbstractInteraction implements Interaction {
 
     protected final ApplicationEventPublisher publisher;
 
-    protected AbstractInteraction(ApplicationEventPublisher publisher) {
+    protected final MetricSender metricSender;
+
+    protected AbstractInteraction(ApplicationEventPublisher publisher, MetricSender metricSender) {
         this.publisher = publisher;
+        this.metricSender = metricSender;
     }
 
     protected SendMessage prepareAnswer(Long chatId, String text) {
