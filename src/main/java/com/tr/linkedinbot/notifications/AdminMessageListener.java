@@ -18,7 +18,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @RequiredArgsConstructor
 public class AdminMessageListener implements ApplicationListener<AdminMessageEvent> {
 
-
     private final LinkedInAccountService linkedInAccountService;
     private final LinkedInBot linkedInBot;
 

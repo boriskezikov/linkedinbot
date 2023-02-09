@@ -2,22 +2,23 @@ package com.tr.linkedinbot.commands.interactions;
 
 import com.tr.linkedinbot.commands.KeyboardHelper;
 import com.tr.linkedinbot.commands.TextConstants;
-import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
-import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.MetricSender;
 import com.tr.linkedinbot.model.BotState;
+import com.tr.linkedinbot.model.Role;
 import com.tr.linkedinbot.notifications.events.AnswerEvent;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import java.util.Arrays;
+
 @Component
-public class ChangeLinkInteraction extends AbstractInteraction {
+public class ChangeRoleInteraction extends AbstractInteraction {
 
     private final LinkedInProfileRepository repository;
 
-    protected ChangeLinkInteraction(
+    protected ChangeRoleInteraction(
             ApplicationEventPublisher publisher,
             LinkedInProfileRepository repository,
             MetricSender metricSender
@@ -31,20 +32,15 @@ public class ChangeLinkInteraction extends AbstractInteraction {
         metricSender.registerInteraction(message);
 
         var linkedInProfile = repository.getByChatId(message.getChatId()).orElseThrow();
-        String validUrl;
-        try {
-            validUrl = LinkedInAccountService.checkValid(message.getText());
-        } catch (IllegalLinkedInProfileException e) {
-            publisher.publishEvent(new AnswerEvent(this, prepareAnswer(message.getChatId(), e.getMessage()), getUserName(message)));
-            return;
-        }
-        linkedInProfile.setLinkedInUrl(validUrl);
-        publisher.publishEvent(new AnswerEvent(this, prepareAnswer(message.getChatId(), TextConstants.LINK_CHANGED_MESSAGE.getText(), KeyboardHelper.profileKeyboard), getUserName(message)));
+        linkedInProfile.setRole(Role.fromString(message.getText()));
+        repository.save(linkedInProfile);
+
+        publisher.publishEvent(new AnswerEvent(this, prepareAnswer(message.getChatId(), TextConstants.ROLE_CHANGED_MESSAGE.getText(), KeyboardHelper.profileKeyboard), getUserName(message)));
     }
 
     @Override
     public BotState getBotStateForInteraction() {
-        return BotState.CHANGE_LINK;
+        return BotState.CHANGE_ROLE;
     }
 
 }

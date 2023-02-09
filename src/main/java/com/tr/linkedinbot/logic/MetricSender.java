@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Component
@@ -30,6 +31,20 @@ public class MetricSender {
 
     public void registerNewUserEvent(Message message) {
         Counter.builder("new_user_event")
+                .register(registry)
+                .increment();
+    }
+
+    public void registerCompleteProfileNotification(String chatId) {
+        Counter.builder("complete_profile_notification")
+                .tag("chatId", chatId)
+                .register(registry)
+                .increment();
+    }
+
+    public void registerNewProfilesLinksNotification(String chatId) {
+        Counter.builder("new_profiles_links_notification")
+                .tag("chatId", chatId)
                 .register(registry)
                 .increment();
     }
