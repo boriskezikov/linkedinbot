@@ -9,6 +9,7 @@ import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.MetricSender;
 import com.tr.linkedinbot.model.CommandEnum;
 import com.tr.linkedinbot.model.LinkedInProfile;
+import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,6 @@ public class GetProfilesCommand extends ServiceCommand {
 
     private final LinkedInAccountService linkedInAccountService;
     private final MetricSender metricSender;
-    private final LinkedInBotConfig config;
 
     @Override
     public String getCommandIdentifier() {
@@ -55,7 +55,7 @@ public class GetProfilesCommand extends ServiceCommand {
 
     private String getProfiles(Chat chat, String userName) {
         String getProfilesMessage;
-        var linkedInProfiles = linkedInAccountService.loadRandomRecords(chat.getId(), userName, config.getRandomLimit());
+        var linkedInProfiles = linkedInAccountService.loadRandomRecords(chat.getId(), userName);
         if (linkedInProfiles.isEmpty()) {
             getProfilesMessage = GET_PROFILES_NO_USERS_MESSAGE.getText();
         } else {

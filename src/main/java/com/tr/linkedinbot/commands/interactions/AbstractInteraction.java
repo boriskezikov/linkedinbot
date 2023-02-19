@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.ForwardMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public abstract class AbstractInteraction implements Interaction {
 
@@ -26,6 +27,14 @@ public abstract class AbstractInteraction implements Interaction {
         SendMessage answer = new SendMessage();
         answer.setText(text);
         answer.setChatId(chatId.toString());
+        return answer;
+    }
+
+    protected SendMessage prepareAnswer(Long chatId, String text, ReplyKeyboardMarkup keyboardMarkup) {
+        SendMessage answer = new SendMessage();
+        answer.setText(text);
+        answer.setChatId(chatId.toString());
+        answer.setReplyMarkup(keyboardMarkup);
         return answer;
     }
 

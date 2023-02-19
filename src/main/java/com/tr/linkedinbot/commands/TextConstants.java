@@ -15,22 +15,23 @@ public enum TextConstants {
     GET_PROFILES_NO_USERS_MESSAGE("Нам пока нечего тебе показать( Пингани ребят в чате, чтоб грузили свои профили!\n" +
             "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
-    HELP_MESSAGE("Я помогу обзавестить коннектами с участниками нашего сообщества в LinkedIn\\!\n" +
-            "Кидай ссылку на свой профиль, и я поделюсь с тобой контактами\\!\n\n" +
-            "Вот пример рабочей ссылки: `https://www\\.linkedin\\.com/in/boriskezikov/`\n" +
-            "Если что\\-то идет не так, пиши @kezik\\_off, он прикрутит костыль\uD83D\uDE09" +
-            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.MARKDOWNV2),
+    HELP_MESSAGE("Команда /get_next_profiles позволяет получить профили с учетом твоих настроек поиска!\n\n" +
+            "Команда /show_profile позволяет просмотреть-изменить-заполнить свой профиль!\n\n" +
+            "Команда /feedback позволяет написать админам, если что-то пошло не так или есть пожелания по работе бота\n\n" +
+            "With love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
 
     DONT_UNDERSTAND_GLOBAL_ERROR_MESSAGE("Простите, я не понимаю Вас. Возможно, Вам поможет /help\n" +
             "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
-    PROFILE_SAVED_MESSAGE("Сохранил твой профиль. Можешь приступать к добавлению новых контактов.\n" +
-            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
+    PROFILE_SAVED_MESSAGE("Теперь нужно заполнить профиль - для этого воспользуйся командой /show_profile.\n", ParseMode.HTML),
 
-    START_MESSAGE("Прежде чем начнём, я расскажу, как это работает!" +
-            "\n\nКоманда /get_next_profiles позволяет получить список 10 случайных профилей в системе, что удобно, если ты только присоединился.\n\nВыполняй команду, добавляй в друзья, а дальше бот сам будет рассылать уведомления о новых профилях!" +
-            "\n\nПрисылай ссылку на свой профиль в формате https://www.linkedin.com/in/...  и поехали!" +
+    START_MESSAGE("Привет! Я бот, который поможет тебе обзавестить коннектами с участниками нашего сообщества в LinkedIn" +
+            "\n\n- Присылай ссылку на свой LinkedIn в формате https://www.linkedin.com/in/...  " +
+            "\n\n- Заполняй профиль: укажи свою страну, роль, а также роли других участников, которые тебе рекомендовать." +
+            "\n Это важно, иначе я не смогу тебе подобрать нужные коннекты\uD83D\uDE14" +
+            "\n\n- Команда /get_next_profiles позволяет получить новые профили с учетом твоих настроек поиска " +
+            "\n\n- Также тебе будут приходить уведомления с профилями новых пользователей, не пропусти!" +
             "\n\nОтправляя нам ссылку на свой профиль, ты даешь согласие на обработку и хранение персональных данных." +
             "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
@@ -50,7 +51,19 @@ public enum TextConstants {
 
     NEW_LINK_MESSAGE("Напиши новую ссылку:\n", ParseMode.HTML),
 
-    LINK_CHANGED_MESSAGE("Ссылка успешно изменена\uD83E\uDD73\n", ParseMode.HTML);
+    LINK_CHANGED_MESSAGE("Ссылка успешно изменена\uD83E\uDD73\n", ParseMode.HTML),
+
+    NEW_COUNTRY_MESSAGE("Выбери свою страну:\n", ParseMode.HTML),
+    NEW_ROLE_SEARCH_MESSAGE("Добавь роли поиска:\n", ParseMode.HTML),
+    NEW_ROLE_MESSAGE("Выбери свою позицию:\n", ParseMode.HTML),
+    COMPLETE_PROFILE_MESSAGE("Привет! Не забудь заполнить свой профиль, так мы сможем рекомендовать его другим участникам и подбирать тебе подходящие профили\uD83D\uDE09\n", ParseMode.HTML),
+
+    COUNTRY_CHANGED_MESSAGE("Страна поиска успешно изменена\uD83E\uDD73\n", ParseMode.HTML),
+    SEARCH_ROLES_CHANGED_MESSAGE("Роль поиска изменена\uD83E\uDD73\n", ParseMode.HTML),
+    ROLE_CHANGED_MESSAGE("Роль изменена\uD83E\uDD73\n", ParseMode.HTML),
+    PROFILE_MESSAGE("Твой профиль\n\uD83D\uDD17ссылка: %s\n\uD83D\uDCCD страна поиска: %s\n\uD83E\uDDD1\u200D\uD83D\uDCBB твоя роль : %s\n\uD83D\uDD0E теги поиска: %s", ParseMode.HTML),
+    EXIT_MESSAGE("Изменения сохранены!", ParseMode.HTML),
+    EXIT_MESSAGE_FULL_PROFILE("Молодец, ты заполнил профиль\uD83D\uDE0E\n Теперь бот будет рекомендовать тебе людей с учетом твоего выбора, также ты можешь получить новые профили по команде /get_next_profiles", ParseMode.HTML);
 
     private final String text;
     private final String parseMode;

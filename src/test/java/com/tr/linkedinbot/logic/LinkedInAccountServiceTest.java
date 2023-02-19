@@ -21,13 +21,11 @@ class LinkedInAccountServiceTest {
 
     private LinkedInProfileRepository repository;
 
-    private ApplicationEventPublisher publisher;
 
     @BeforeEach
     void setUp() {
         repository = Mockito.mock(LinkedInProfileRepository.class);
-        publisher = Mockito.mock(ApplicationEventPublisher.class);
-        service = new LinkedInAccountService(repository, publisher);
+        service = new LinkedInAccountService(repository);
     }
 
     @ParameterizedTest
@@ -46,7 +44,6 @@ class LinkedInAccountServiceTest {
         service.createNewProfile(message, "");
 
         verify(repository, times(1)).save(any());
-        verify(publisher, times(1)).publishEvent(any());
     }
 
     @ParameterizedTest

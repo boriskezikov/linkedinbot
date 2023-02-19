@@ -28,11 +28,12 @@ public class InteractionManager {
         Optional<LinkedInProfile> linkedInProfile = repository.getByChatId(chatId);
         interactOnCurrentState(message, linkedInProfile);
 
-        linkedInProfile.ifPresent(profile -> profile.setState(BotState.NOT_IN_INTERACTION));
+//        linkedInProfile.ifPresent(profile -> profile.setState(BotState.NOT_IN_INTERACTION));
     }
 
     private void interactOnCurrentState(Message message, Optional<LinkedInProfile> linkedInProfile) {
         BotState profileState = linkedInProfile.map(LinkedInProfile::getState).orElse(BotState.EMPTY);
         interactionMap.getOrDefault(profileState, defaultInteraction).interact(message);
+
     }
 }
