@@ -58,6 +58,7 @@ public class LinkedInAccountService {
                 .chatId(message.getChatId())
                 .linkedInUrl(validUrl)
                 .tgUser(username)
+                .registeredAt(LocalDateTime.now())
                 .state(BotState.NOT_IN_INTERACTION)
                 .build();
 

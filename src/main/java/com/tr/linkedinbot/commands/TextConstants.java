@@ -56,7 +56,7 @@ public enum TextConstants {
     NEW_COUNTRY_MESSAGE("Выбери свою страну:\n", ParseMode.HTML),
     NEW_ROLE_SEARCH_MESSAGE("Добавь роли поиска:\n", ParseMode.HTML),
     NEW_ROLE_MESSAGE("Выбери свою позицию:\n", ParseMode.HTML),
-    COMPLETE_PROFILE_MESSAGE("Привет! Не забудь заполнить свой профиль, так мы сможем рекомендовать его другим участникам и подбирать тебе подходящие профили\uD83D\uDE09\n", ParseMode.HTML),
+    COMPLETE_PROFILE_MESSAGE("Привет! Не забудь заполнить свой профиль, для этого воспользуйся командой /show_profile, так мы сможем рекомендовать его другим участникам и подбирать тебе подходящие профили\uD83D\uDE09\n", ParseMode.HTML),
 
     COUNTRY_CHANGED_MESSAGE("Страна поиска успешно изменена\uD83E\uDD73\n", ParseMode.HTML),
     SEARCH_ROLES_CHANGED_MESSAGE("Роль поиска изменена\uD83E\uDD73\n", ParseMode.HTML),
