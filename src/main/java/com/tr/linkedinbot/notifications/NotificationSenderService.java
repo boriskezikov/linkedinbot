@@ -35,6 +35,11 @@ public class NotificationSenderService {
 
     public void sendNewUsersLinksToProfile(LinkedInProfile linkedInProfile, Set<String> links) {
         var chatId = linkedInProfile.getChatId().toString();
+
+        if (links.isEmpty()) {
+            return;
+        }
+
         publisher.publishEvent(new AnswerEvent(
                         this,
                         SendMessage.builder()
