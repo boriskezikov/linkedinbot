@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -82,7 +83,7 @@ public class LinkedInAccountService {
         var linkedInProfile = repository.getByChatId(chatId).orElseThrow();
 
         List<LinkedInProfile> all = getLinkedInProfiles(linkedInProfile);
-        removeRequester(all, tgName, chatId);
+        all = removeRequester(all, tgName, chatId);
 
         updatePageNumber(linkedInProfile, all);
         return all;
@@ -100,11 +101,11 @@ public class LinkedInAccountService {
 
     private List<LinkedInProfile> getLinkedInProfiles(LinkedInProfile linkedInProfile) {
         var pageNumber = linkedInProfile.getPageNumber();
-        Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by("registeredAt"));
+        Pageable pageable = PageRequest.of(pageNumber, 10, Sort.by("registeredAt"));
 
-        return linkedInProfile.getCountry().equals(Country.ISRAEL) ?
-                repository.findAllByRoleInAndCountry(linkedInProfile.getSearchRoles(), linkedInProfile.getCountry(), pageable) :
-                repository.findAllByRoleIn(linkedInProfile.getSearchRoles(), pageable);
+        return Optional.of(repository.findAll(pageable))
+                .map(Slice::getContent)
+                .orElse(Collections.emptyList());
     }
 
     public List<LinkedInProfile> loadIncompleteProfilesWithDaysOffset(int days) {
@@ -205,9 +206,15 @@ public class LinkedInAccountService {
         return linkedInProfile -> linkedInProfile.getRole() == null || linkedInProfile.getCountry() == null || linkedInProfile.getSearchRoles() == null || linkedInProfile.getSearchRoles().isEmpty();
     }
 
-    private void removeRequester(List<LinkedInProfile> all, String tgName, Long chatId) {
-        all.removeIf(linkedInProfile -> linkedInProfile.getTgUser().equals(tgName) ||
-                linkedInProfile.getChatId().equals(chatId));
+    private List<LinkedInProfile> removeRequester(List<LinkedInProfile> all, String tgName, Long chatId) {
+        return all.stream()
+                .filter(filterRequester(tgName, chatId).negate())
+                .collect(Collectors.toList());
+    }
+
+    private static Predicate<LinkedInProfile> filterRequester(String tgName, Long chatId) {
+        return linkedInProfile -> linkedInProfile.getTgUser().equals(tgName) ||
+                linkedInProfile.getChatId().equals(chatId);
     }
 
     public boolean validateUpload(Long chatId, String tgName) {
