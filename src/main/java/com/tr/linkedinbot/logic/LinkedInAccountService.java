@@ -60,6 +60,7 @@ public class LinkedInAccountService {
                 .linkedInUrl(validUrl)
                 .tgUser(username)
                 .registeredAt(LocalDateTime.now())
+                .pageNumber(0)
                 .state(BotState.NOT_IN_INTERACTION)
                 .build();
 
