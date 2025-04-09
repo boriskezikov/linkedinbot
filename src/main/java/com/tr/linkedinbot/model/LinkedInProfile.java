@@ -1,38 +1,84 @@
 package com.tr.linkedinbot.model;
 
 import lombok.*;
-import org.hibernate.Hibernate;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
- import javax.persistence.Entity;
-import javax.persistence.Id;
+ import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
-@Getter
-@Setter
-@ToString
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@EqualsAndHashCode(of = "chatId")
+@TypeDef(name = "list-array", typeClass = ListArrayType.class)
 public class LinkedInProfile {
 
     @Id
     private Long chatId;
+
     private String tgUser;
+
     private String linkedInUrl;
     private LocalDateTime lastProfileGet;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        LinkedInProfile that = (LinkedInProfile) o;
-        return chatId != null && Objects.equals(chatId, that.chatId);
+    private LocalDateTime registeredAt;
+
+    @Enumerated(EnumType.STRING)
+    private BotState state;
+
+    @Enumerated(EnumType.STRING)
+    private Country country;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Type(type = "list-array")
+    @Column(
+            name = "search_roles",
+            columnDefinition = "varchar[]"
+    )
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private List<String> searchRolesString;
+
+    @Transient
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private Set<Role> searchRoles;
+
+    private Integer pageNumber;
+
+    @PostLoad
+    public void loadSearchRoles() {
+        searchRoles = Optional.ofNullable(searchRolesString)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(Role::valueOf)
+                .collect(Collectors.toSet());
     }
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
+    public void removeSearchRole(Role role) {
+        searchRoles.remove(role);
+        searchRolesString = searchRoles.stream().map(Role::name).collect(Collectors.toList());
     }
+
+    public void addSearchRole(Role role) {
+        searchRoles.add(role);
+        searchRolesString = searchRoles.stream().map(Role::name).collect(Collectors.toList());
+    }
+
+    public Set<Role> getSearchRoles() {
+        return Collections.unmodifiableSet(searchRoles);
+    }
+
+    public boolean isComplete() {
+        return country != null && !searchRoles.isEmpty() && role != null;
+    }
+
 }

@@ -1,6 +1,9 @@
 package com.tr.linkedinbot.repository;
 
+import com.tr.linkedinbot.model.Country;
 import com.tr.linkedinbot.model.LinkedInProfile;
+import com.tr.linkedinbot.model.Role;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +12,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile, Long> {
@@ -20,6 +26,19 @@ public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile
     @Transactional
     @Query(value = "select * from linked_in_profile where to_remove = 'false' order by random() limit :#{#limit}", nativeQuery = true)
     List<LinkedInProfile> selectRandom(@Param(value = "limit") @Valid Integer limit);
+
+    Optional<LinkedInProfile> getByChatId(Long chatId);
+
+    List<LinkedInProfile> findAllByRoleInAndCountry(Set<Role> roles, Country country, Pageable pageable);
+
+    List<LinkedInProfile> findAllByRoleIn(Set<Role> roles, Pageable pageable);
+
+    @Query(value = "select * from linked_in_profile where :role = any(search_roles)", nativeQuery = true)
+    List<LinkedInProfile> findAllBySearchRole(String role);
+
+
+    @Query(value = "select * from linked_in_profile where registered_at >= :start_date and registered_at < :end_date", nativeQuery = true)
+    List<LinkedInProfile> findAllByRegisterDate(@Param(value = "start_date") LocalDateTime startDate, @Param(value = "end_date") LocalDateTime endDate);
 
     @Transactional
     @Query(value = "with t as (select unnest(i.showed_ids) as ids from linked_in_profile i where i.chat_id = :chatId) " +
@@ -36,8 +55,6 @@ public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile
     @Query(value = "update linked_in_profile set showed_ids = ARRAY_APPEND(showed_ids, :shownId) where chat_id = :hostId", nativeQuery = true)
     void writeShownChatId(@Param(value = "hostId") Long chatId,
                           @Param(value = "shownId") Long shownId);
-
-
 
 
     @Query(value = "select cardinality(i.showed_ids) as ids from linked_in_profile i where i.chat_id = :chatId", nativeQuery = true)

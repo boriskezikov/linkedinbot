@@ -9,23 +9,35 @@ spring:
     url: "jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?currentSchema=${DATABASE_SCHEMA}"
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
-    platform: POSTGRESQL
+    driver-class-name: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-    hibernate:
-      ddl-auto: none
-      dialect: org.hibernate.dialect.PostgreSQL9Dialect
-      show_sql: true
-    properties.hibernate.temp.use_jdbc_metadata_defaults: false
-
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    properties: {"hibernate.temp.use_jdbc_metadata_defaults": "false"}
+    hibernate.ddl-auto: none
+    open-in-view: false
 
 bot:
   name: ${BOT_NAME}
   token: ${BOT_TOKEN}
-  admin: ${ADMIN_NICKNAME}
-  pass: ${ADMIN_PASS}
+  admin:
+    name: ${ADMIN_NICKNAME}
+    chatId: ${ADMIN_CHATID}
   random:
     limit: ${BOT_RANDOM_LIMIT}
 
 server:
   port: ${PORT:5000}
+
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+    health:
+      enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, metrics
