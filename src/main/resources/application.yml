@@ -28,6 +28,12 @@ bot:
 server:
   port: ${PORT:5000}
 
+
+allpay:
+  api-login: ${AP_CLIENT_ID:pp1009265}
+  api-key: ${AP_CLIENT_SECRET:DD4318BB9BF105E6F4616E0A83D82174}
+  api-pay-url: ${AP_PAY_URL:https://allpay.to/app/?show=getpayment&mode=api8}
+
 management:
   endpoint:
     metrics:

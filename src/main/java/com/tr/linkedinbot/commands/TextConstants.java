@@ -46,12 +46,11 @@ public enum TextConstants {
     NEED_PAY_MESSAGE("Запрашивать профили можно один раз в две минуты." +
             "\n\nСкоро для снятия ограничений будет требоваться обязательная оплата. " +
             "\n\nМы тратим средства волонтёров на поддержку этого проекта." +
-            "\n\nА пока подумай о донате: "   +
-            "\n\nBTC: 1G44444444 "   +
-            "\n\nETH: 0x555555555 "   +
+            "\n\nА пока подумай о донате: " +
+            "\n\nBTC: 1G44444444 " +
+            "\n\nETH: 0x555555555 " +
             "\n\nUSDT (TRC20): 0x66666666"
             , ParseMode.HTML),
-    ADMIN_MESSAGE("Напиши текст для объявления\n", ParseMode.HTML),
 
     ADMIN_INTRODUCTION("‼️Сообщение от админов‼️:\n", ParseMode.HTML),
 
@@ -73,16 +72,16 @@ public enum TextConstants {
     ROLE_CHANGED_MESSAGE("Роль изменена\uD83E\uDD73\n", ParseMode.HTML),
     PROFILE_MESSAGE("Твой профиль\n\uD83D\uDD17ссылка: %s\n\uD83D\uDCCD страна поиска: %s\n\uD83E\uDDD1\u200D\uD83D\uDCBB твоя роль : %s\n\uD83D\uDD0E теги поиска: %s", ParseMode.HTML),
     EXIT_MESSAGE("Изменения сохранены!", ParseMode.HTML),
-    EXIT_MESSAGE_FULL_PROFILE("Молодец, ты заполнил профиль\uD83D\uDE0E\n Теперь бот будет рекомендовать тебе людей с учетом твоего выбора, также ты можешь получить новые профили по команде /get_next_profiles", ParseMode.HTML);
+    EXIT_MESSAGE_FULL_PROFILE("Молодец, ты заполнил профиль\uD83D\uDE0E\n Теперь бот будет рекомендовать тебе людей с учетом твоего выбора, также ты можешь получить новые профили по команде /get_next_profiles", ParseMode.HTML),
 
     NEED_PAY_SIZE_MESSAGE("Ты уже получил более 20 профилей, а нам приходится бороться со спаммерами!  " +
-                             "\n\nСкоро для снятия ограничений будет требоваться обязательная оплата. " +
-                             "\n\nМы тратим средства волонтёров на поддержку этого проекта." +
-                             "\n\nА пока подумай о донате: "   +
-                             "\n\nBTC: 1G44444444 "   +
-                             "\n\nETH: 0x555555555 "   +
-                             "\n\nUSDT (TRC20): 0x66666666"
-                             , ParseMode.HTML);
+            "\n\nСкоро для снятия ограничений будет требоваться обязательная оплата. " +
+            "\n\nМы тратим средства волонтёров на поддержку этого проекта." +
+            "\n\nА пока подумай о донате: " +
+            "\n\nBTC: 1G44444444 " +
+            "\n\nETH: 0x555555555 " +
+            "\n\nUSDT (TRC20): 0x66666666"
+            , ParseMode.HTML);
 
     private final String text;
     private final String parseMode;

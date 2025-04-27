@@ -2,33 +2,27 @@ package com.tr.linkedinbot.logic;
 
 import static com.tr.linkedinbot.commands.TextConstants.INVALID_LINKEDIN_LINK_ERROR_MESSAGE;
 import static com.tr.linkedinbot.commands.TextConstants.PROFILE_ALREADY_SAVED_ERROR_MESSAGE;
-
 import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
 import com.tr.linkedinbot.model.BotState;
 import com.tr.linkedinbot.model.Country;
 import com.tr.linkedinbot.model.LinkedInProfile;
 import com.tr.linkedinbot.model.Role;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
-import static java.util.regex.Pattern.compile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,23 +31,53 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LinkedInAccountService {
 
-    /*
-    "^" matches the start of the string, ensuring that the regular expression only matches URLs that start with the specified pattern.
-    "(https?://)?" is a group that matches "http://" or "https://" and is optional, meaning it can match URLs that start with "http://" or "https://" or not.
-    "(www\.)?" is a group that matches "www." and is also optional, meaning it can match URLs that contain "www." or not.
-    "linkedin\.com" matches the domain name "linkedin.com"
-    "/in" matches the string "/in"
-    ".*" matches any character (except for a newline) zero or more times.
-    "$" matches the end of the string, ensuring that the regular expression only matches URLs that end with the specified pattern.
-     */
+    // Регекс для проверки, что URL относится к linkedin.com/in...
     public static final String REGEX = "^(https?://)?(www\\.)?linkedin\\.com/in.*$";
-    private static final Predicate<String> LINKED_IN_VALID_URL_PATTERN_PREDICATE = compile(REGEX).asMatchPredicate();
+    private static final Pattern LINKED_IN_PATTERN = Pattern.compile(REGEX);
+    // Ограничим 1 бесплатный вызов (можешь поменять на 2, 3, или убрать вовсе)
+    private static final int MAX_FREE_USAGE = 1;
     private final LinkedInProfileRepository repository;
 
-    public long countUsers() {
-        return repository.count();
+    /**
+     * Проверка валидности URL LinkedIn
+     */
+    public static String checkValid(String linkedInUrl) {
+        if (LINKED_IN_PATTERN.matcher(linkedInUrl).matches()) {
+            return linkedInUrl.replace("/mwlite", "");
+        } else {
+            throw new IllegalLinkedInProfileException(INVALID_LINKEDIN_LINK_ERROR_MESSAGE.getText());
+        }
     }
 
+    private static BiFunction<LinkedInProfile, Set<String>, Set<String>> mapLinksForProfile(HashMap<Role, Set<String>> rolesWithLinksMap, Role role) {
+        return (linkedInProfile, strings) -> {
+            if (strings == null) {
+                return new HashSet<>(rolesWithLinksMap.get(role));
+            } else {
+                strings.addAll(rolesWithLinksMap.get(role));
+                return strings;
+            }
+        };
+    }
+
+    private static BiFunction<Role, Set<String>, Set<String>> mapLinksForRole(LinkedInProfile profile) {
+        return (r, s) -> {
+            if (s == null) {
+                var set = new HashSet<String>();
+                set.add(profile.getLinkedInUrl());
+                return set;
+            } else {
+                s.add(profile.getLinkedInUrl());
+                return s;
+            }
+        };
+    }
+
+    private static Predicate<LinkedInProfile> getLinkedInProfilePredicate() {
+        return linkedInProfile -> linkedInProfile.getRole() == null || linkedInProfile.getCountry() == null || linkedInProfile.getSearchRoles() == null || linkedInProfile.getSearchRoles().isEmpty();
+    }
+
+    // -------------- Создание нового профиля при первом вводе ссылки
     public void createNewProfile(Message message, String username) {
         Optional<LinkedInProfile> byId = repository.findById(message.getChatId());
         if (byId.isPresent()) {
@@ -61,6 +85,7 @@ public class LinkedInAccountService {
         }
         var validUrl = checkValid(message.getText());
         var chatId = message.getChatId();
+
         LinkedInProfile newProfile = LinkedInProfile.builder()
                 .chatId(chatId)
                 .linkedInUrl(validUrl)
@@ -69,77 +94,163 @@ public class LinkedInAccountService {
                 .registeredAt(LocalDateTime.now())
                 .pageNumber(0)
                 .state(BotState.NOT_IN_INTERACTION)
+                // Новые поля:
+                .paid(false)
+                .freeUsage(0)
                 .build();
 
         repository.save(newProfile);
-        linkedInProfileRepository.writeShownChatId(chatId, chatId);
+        // Запишем, что chatId показывали
+        repository.writeShownChatId(chatId, chatId);
+
         log.info(">>> new member added {}", validUrl);
     }
 
-    public static String checkValid(String linkedInUrl) {
-        return Optional.of(linkedInUrl)
-                .filter(LINKED_IN_VALID_URL_PATTERN_PREDICATE)
-                .map(linked -> linked.replace("/mwlite", ""))
-                .orElseThrow(() -> new IllegalLinkedInProfileException(INVALID_LINKEDIN_LINK_ERROR_MESSAGE.getText()));
-    }
-
+    // -------------- Старая логика (пример): загружаем всех
     public List<LinkedInProfile> loadAll() {
         return repository.findAll();
     }
 
-    public List<LinkedInProfile> loadRandomRecords(Long chatId, String tgName) {
-        var linkedInProfile = repository.getByChatId(chatId).orElseThrow();
-
-        List<LinkedInProfile> all = getLinkedInProfiles(linkedInProfile);
-        all = removeRequester(all, tgName, chatId);
-
-        updatePageNumber(linkedInProfile, all);
-        return all;
-    }
-    //TODO: Это зачатки биллинга.
-    // Пока проверяем только время последнего запроса и советвуем сделать донат.
-    // Когда будет мерчант, можно строго проверять оплату.
-    public boolean checkRequesterBillingTime(Long chatId, String tgName) {
-        log.info("Check requester billing {} {}", chatId, tgName);
-
-        LinkedInProfile p = linkedInProfileRepository.getById(chatId);
-        return LocalDateTime.now().isAfter(p.getLastProfileGet().plusMinutes(2));
-    }
-
+    /**
+     * Метод, который проверяет, можно ли выдавать профили по лимиту "размер/количество"
+     * Если user уже оплатил, то всё ок.
+     * Если не оплатил, но freeUsage < MAX_FREE_USAGE, тоже ок (пока что).
+     * Иначе проверяем твоё условие "usage <= 20".
+     */
     public boolean checkRequesterLoadSize(Long chatId, String tgName) {
         log.info("Check requester load size {} {}", chatId, tgName);
 
-        Long l = linkedInProfileRepository.selectRequesterLoadSize(chatId);
-        return l <= 20;
+        LinkedInProfile p = repository.getById(chatId);
+
+        if (Boolean.TRUE.equals(p.getPaid())) {
+            // оплаченный пользователь, пропускаем
+            return true;
+        }
+        // если ещё не израсходовал бесплатную попытку
+        if (p.getFreeUsage() < MAX_FREE_USAGE) {
+            return true;
+        }
+
+        // Иначе считаем, что пользователь превысил лимит
+        Long usage = repository.selectRequesterLoadSize(chatId);
+        return usage <= 20; // твоя старая логика
     }
 
-    public List<LinkedInProfile> loadRandomRecords(Long chatId, String tgName, int limit) {
+    /**
+     * Метод, который проверяет, можно ли выдавать профили по "времени".
+     * Если user уже оплатил – пропускаем.
+     * Если не оплатил, но freeUsage < MAX_FREE_USAGE, тоже пропускаем 1 раз.
+     * Иначе смотрим, прошло ли 2 минуты от lastProfileGet.
+     */
+    public boolean checkRequesterBillingTime(Long chatId, String tgName) {
+        log.info("Check requester billing time {} {}", chatId, tgName);
+
+        LinkedInProfile p = repository.getById(chatId);
+
+        if (Boolean.TRUE.equals(p.getPaid())) {
+            return true;
+        }
+
+        if (p.getFreeUsage() < MAX_FREE_USAGE) {
+            return true;
+        }
+
+        return LocalDateTime.now().isAfter(
+                p.getLastProfileGet().plusMinutes(2)
+        );
+    }
+
+    /**
+     * Загружаем случайные записи (для выдачи пользователю).
+     * Здесь же, если реально отдали профили и user не оплачен, увеличиваем freeUsage.
+     */
+    public List<LinkedInProfile> loadRandomRecords(Long chatId, String tgName) {
         log.info("Loading profiles for {} {}", chatId, tgName);
 
-        var all = linkedInProfileRepository.selectRandomForRequester(chatId, limit);
-        all.forEach(l -> linkedInProfileRepository.writeShownChatId(chatId, l.getChatId()));
+        var requestor = repository.getByChatId(chatId)
+                .orElseThrow(() -> new RuntimeException("Profile not found for chatId " + chatId));
 
-        if(all.size() > 0)
+        // выбираем некую логику рандомного подбора
+        int limit = 10; // например, 10 штук
+        var all = repository.selectRandomForRequester(chatId, limit);
+
+        // записываем, что эти чаты "были показаны"
+        all.forEach(l -> repository.writeShownChatId(chatId, l.getChatId()));
+
+        if (!all.isEmpty()) {
             updateLastGetDate(chatId);
+        }
+
+        // Если пользователь ещё не оплачен и ещё не израсходовал свою бесплатную попытку,
+        // то поднимем счётчик freeUsage
+        if (!Boolean.TRUE.equals(requestor.getPaid()) && requestor.getFreeUsage() < MAX_FREE_USAGE && !all.isEmpty()) {
+            requestor.setFreeUsage(requestor.getFreeUsage() + 1);
+            repository.save(requestor);
+        }
 
         return all;
-    private void updatePageNumber(LinkedInProfile linkedInProfile, List<LinkedInProfile> all) {
-        if (all.isEmpty()) {
-            linkedInProfile.setPageNumber(0);
-        } else {
-            var pageNumber = linkedInProfile.getPageNumber();
-            linkedInProfile.setPageNumber(pageNumber + 1);
+    }
+
+    /**
+     * Обновлённая версия (если нужно указать limit явно)
+     */
+    public List<LinkedInProfile> loadRandomRecords(Long chatId, String tgName, int limit) {
+        log.info("Loading profiles for {} {}, limit {}", chatId, tgName, limit);
+
+        var requestor = repository.getByChatId(chatId)
+                .orElseThrow(() -> new RuntimeException("Profile not found for chatId " + chatId));
+
+        var all = repository.selectRandomForRequester(chatId, limit);
+        all.forEach(l -> repository.writeShownChatId(chatId, l.getChatId()));
+
+        if (!all.isEmpty()) {
+            updateLastGetDate(chatId);
         }
-        repository.save(linkedInProfile);
+
+        if (!Boolean.TRUE.equals(requestor.getPaid()) && requestor.getFreeUsage() < MAX_FREE_USAGE && !all.isEmpty()) {
+            requestor.setFreeUsage(requestor.getFreeUsage() + 1);
+            repository.save(requestor);
+        }
+
+        return all;
+    }
+
+    // обновляем время последнего запроса
+    private void updateLastGetDate(Long chatId) {
+        LinkedInProfile p = repository.getById(chatId);
+        p.setLastProfileGet(LocalDateTime.now());
+        repository.save(p);
+    }
+
+    /**
+     * Ставим user.paid = true после оплаты
+     */
+    public void setPaid(Long chatId) {
+        LinkedInProfile profile = repository.getById(chatId);
+        profile.setPaid(true);
+        // Если хочешь, можешь сбросить freeUsage в 0:
+        // profile.setFreeUsage(0);
+        repository.save(profile);
+    }
+
+    // ---------------------------------------
+    // Логика validateUpload осталась как есть
+    // ---------------------------------------
+    public boolean validateUpload(Long chatId, String tgName) {
+        return repository.existsByChatIdOrTgUser(chatId, tgName);
+    }
+
+    public long countUsers() {
+        return repository.count();
     }
 
     private List<LinkedInProfile> getLinkedInProfiles(LinkedInProfile linkedInProfile) {
         var pageNumber = linkedInProfile.getPageNumber();
-        Pageable pageable = PageRequest.of(pageNumber, 10, Sort.by("registeredAt"));
+        Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by("registeredAt"));
 
-        return Optional.of(repository.findAll(pageable))
-                .map(Slice::getContent)
-                .orElse(Collections.emptyList());
+        return linkedInProfile.getCountry().equals(Country.ISRAEL) ?
+                repository.findAllByRoleInAndCountry(linkedInProfile.getSearchRoles(), linkedInProfile.getCountry(), pageable) :
+                repository.findAllByRoleIn(linkedInProfile.getSearchRoles(), pageable);
     }
 
     public List<LinkedInProfile> loadIncompleteProfilesWithDaysOffset(int days) {
@@ -207,58 +318,18 @@ public class LinkedInAccountService {
         return profilesWithLinksMap;
     }
 
-    private static BiFunction<LinkedInProfile, Set<String>, Set<String>> mapLinksForProfile(HashMap<Role, Set<String>> rolesWithLinksMap, Role role) {
-        return (linkedInProfile, strings) -> {
-            if (strings == null) {
-                return new HashSet<>(rolesWithLinksMap.get(role));
-            } else {
-                strings.addAll(rolesWithLinksMap.get(role));
-                return strings;
-            }
-        };
-    }
-
-    private static BiFunction<Role, Set<String>, Set<String>> mapLinksForRole(LinkedInProfile profile) {
-        return (r, s) -> {
-            if (s == null) {
-                var set  = new HashSet<String>();
-                set.add(profile.getLinkedInUrl());
-                return set;
-            } else {
-                s.add(profile.getLinkedInUrl());
-                return s;
-            }
-        };
-    }
-
-
     private Predicate<LinkedInProfile> filterByCountryAndRole() {
         return linkedInProfile -> linkedInProfile.getRole() != null && linkedInProfile.getCountry() != null;
     }
 
-    private static Predicate<LinkedInProfile> getLinkedInProfilePredicate() {
-        return linkedInProfile -> linkedInProfile.getRole() == null || linkedInProfile.getCountry() == null || linkedInProfile.getSearchRoles() == null || linkedInProfile.getSearchRoles().isEmpty();
-    }
-
-    private List<LinkedInProfile> removeRequester(List<LinkedInProfile> all, String tgName, Long chatId) {
-        return all.stream()
-                .filter(filterRequester(tgName, chatId).negate())
-                .collect(Collectors.toList());
-    }
-
-    private static Predicate<LinkedInProfile> filterRequester(String tgName, Long chatId) {
-        return linkedInProfile -> linkedInProfile.getTgUser().equals(tgName) ||
-                linkedInProfile.getChatId().equals(chatId);
-    }
-
-    public boolean validateUpload(Long chatId, String tgName) {
-        return repository.existsByChatIdOrTgUser(chatId, tgName);
-    }
-
-    private void updateLastGetDate(Long chatId) {
-        LinkedInProfile p = linkedInProfileRepository.getById(chatId);
-        p.setLastProfileGet(LocalDateTime.now());
-        linkedInProfileRepository.save(p);
+    private void updatePageNumber(LinkedInProfile linkedInProfile, List<LinkedInProfile> all) {
+        if (all.isEmpty()) {
+            linkedInProfile.setPageNumber(0);
+        } else {
+            var pageNumber = linkedInProfile.getPageNumber();
+            linkedInProfile.setPageNumber(pageNumber + 1);
+        }
+        repository.save(linkedInProfile);
     }
 
 }

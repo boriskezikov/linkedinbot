@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 @Component
-public class DefaultInteraction extends AbstractInteraction{
+public class DefaultInteraction extends AbstractInteraction {
 
     public DefaultInteraction(ApplicationEventPublisher publisher, MetricSender metricSender) {
         super(publisher, metricSender);

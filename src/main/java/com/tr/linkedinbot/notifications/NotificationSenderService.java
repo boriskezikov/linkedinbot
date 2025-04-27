@@ -46,7 +46,7 @@ public class NotificationSenderService {
                                 .chatId(chatId)
                                 .text("Новые профили с учетом твоих настроек поиска! Добавляй в друзья:\n\n\uD83D\uDE80" + String.join("\n\n\uD83D\uDE80", links))
                                 .build(),
-                linkedInProfile.getTgUser()
+                        linkedInProfile.getTgUser()
                 )
         );
 

@@ -1,8 +1,9 @@
 package com.tr.linkedinbot.commands.admin;
 
 import com.tr.linkedinbot.commands.ServiceCommand;
+import static com.tr.linkedinbot.commands.TextConstants.ADMIN_MESSAGE;
 import com.tr.linkedinbot.model.BotState;
-import com.tr.linkedinbot.model.CommandEnum;
+import static com.tr.linkedinbot.model.CommandEnum.ADMIN_ANNOUNCE;
 import com.tr.linkedinbot.model.LinkedInProfile;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,18 +13,15 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import static com.tr.linkedinbot.commands.TextConstants.ADMIN_MESSAGE;
-import static com.tr.linkedinbot.model.CommandEnum.*;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AnnounceCommand extends ServiceCommand {
 
+    private final LinkedInProfileRepository repository;
     @Value("${bot.admin.name}")
     private String admin;
 
-    private final LinkedInProfileRepository repository;
     @Override
     public String getCommandIdentifier() {
         return ADMIN_ANNOUNCE.getName();

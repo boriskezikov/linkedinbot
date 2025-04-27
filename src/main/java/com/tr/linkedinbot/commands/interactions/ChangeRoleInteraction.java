@@ -11,8 +11,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.Arrays;
-
 @Component
 public class ChangeRoleInteraction extends AbstractInteraction {
 

@@ -3,11 +3,14 @@ package com.tr.linkedinbot.model;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import com.vladmihalcea.hibernate.type.array.ListArrayType;
 
- import javax.persistence.*;
+import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -23,10 +26,8 @@ public class LinkedInProfile {
     private Long chatId;
 
     private String tgUser;
-
     private String linkedInUrl;
     private LocalDateTime lastProfileGet;
-
     private LocalDateTime registeredAt;
 
     @Enumerated(EnumType.STRING)
@@ -38,21 +39,19 @@ public class LinkedInProfile {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    // массив строк (через Hibernate-Types)
     @Type(type = "list-array")
-    @Column(
-            name = "search_roles",
-            columnDefinition = "varchar[]"
-    )
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
+    @Column(name = "search_roles", columnDefinition = "varchar[]")
     private List<String> searchRolesString;
 
     @Transient
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
     private Set<Role> searchRoles;
 
     private Integer pageNumber;
+
+    // === Новые поля для "платёжной" логики ===
+    private Boolean paid = false;        // false = не оплатил, true = оплатил
+    private Integer freeUsage = 0;       // сколько раз уже бесплатно взял профили
 
     @PostLoad
     public void loadSearchRoles() {
@@ -80,5 +79,4 @@ public class LinkedInProfile {
     public boolean isComplete() {
         return country != null && !searchRoles.isEmpty() && role != null;
     }
-
 }

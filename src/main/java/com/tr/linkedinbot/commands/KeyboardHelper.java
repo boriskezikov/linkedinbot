@@ -107,6 +107,7 @@ public class KeyboardHelper {
 
         return replyKeyboardMarkup;
     }
+
     private static ReplyKeyboardMarkup buildCountryKeyboard() {
         KeyboardRow row1 = new KeyboardRow();
         row1.add(new KeyboardButton(Country.ISRAEL.name()));

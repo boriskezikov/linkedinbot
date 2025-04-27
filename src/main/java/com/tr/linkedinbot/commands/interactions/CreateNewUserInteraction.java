@@ -2,6 +2,7 @@ package com.tr.linkedinbot.commands.interactions;
 
 import com.tr.linkedinbot.commands.KeyboardHelper;
 import com.tr.linkedinbot.commands.TextConstants;
+import static com.tr.linkedinbot.commands.TextConstants.DONT_UNDERSTAND_GLOBAL_ERROR_MESSAGE;
 import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.MetricSender;
@@ -10,8 +11,6 @@ import com.tr.linkedinbot.notifications.events.AnswerEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
-
-import static com.tr.linkedinbot.commands.TextConstants.*;
 
 @Component
 public class CreateNewUserInteraction extends AbstractInteraction {
@@ -38,7 +37,7 @@ public class CreateNewUserInteraction extends AbstractInteraction {
 
             answer = TextConstants.PROFILE_SAVED_MESSAGE.getText();
         } catch (IllegalLinkedInProfileException e) {
-                answer =  e.getMessage();
+            answer = e.getMessage();
         } catch (Exception e) {
             answer = DONT_UNDERSTAND_GLOBAL_ERROR_MESSAGE.getText();
         }

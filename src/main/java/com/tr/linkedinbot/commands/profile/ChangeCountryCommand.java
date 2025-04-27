@@ -4,18 +4,14 @@ import com.tr.linkedinbot.commands.ServiceCommand;
 import com.tr.linkedinbot.commands.TextConstants;
 import com.tr.linkedinbot.logic.MetricSender;
 import com.tr.linkedinbot.model.BotState;
+import static com.tr.linkedinbot.model.CommandEnum.CHANGE_COUNTRY;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.mapping.Collection;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-
-import java.util.Collections;
-
-import static com.tr.linkedinbot.model.CommandEnum.CHANGE_COUNTRY;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +20,7 @@ public class ChangeCountryCommand extends ServiceCommand {
     private final LinkedInProfileRepository repository;
 
     private final MetricSender metricSender;
-    
+
     @Override
     public String getCommandIdentifier() {
         return CHANGE_COUNTRY.getName();

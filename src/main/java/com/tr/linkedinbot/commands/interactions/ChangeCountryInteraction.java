@@ -2,22 +2,15 @@ package com.tr.linkedinbot.commands.interactions;
 
 import com.tr.linkedinbot.commands.KeyboardHelper;
 import com.tr.linkedinbot.commands.TextConstants;
-import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
-import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.MetricSender;
 import com.tr.linkedinbot.model.BotState;
-import com.tr.linkedinbot.model.Country;
-import com.tr.linkedinbot.model.Role;
+import static com.tr.linkedinbot.model.Country.ALL;
+import static com.tr.linkedinbot.model.Country.ISRAEL;
 import com.tr.linkedinbot.notifications.events.AnswerEvent;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import static com.tr.linkedinbot.model.Country.*;
 
 @Component
 public class ChangeCountryInteraction extends AbstractInteraction {
