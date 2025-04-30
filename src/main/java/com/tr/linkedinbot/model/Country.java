@@ -5,11 +5,11 @@ public enum Country {
     EMPTY("Страна еще не установлена"),
     ALL("All");
 
+    private final String description;
+
     Country(String description) {
         this.description = description;
     }
-
-    private final String description;
 
     @Override
     public String toString() {

@@ -11,8 +11,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.Arrays;
-
 @Component
 public class ChangeRoleInteraction extends AbstractInteraction {
 
@@ -36,6 +34,11 @@ public class ChangeRoleInteraction extends AbstractInteraction {
         repository.save(linkedInProfile);
 
         publisher.publishEvent(new AnswerEvent(this, prepareAnswer(message.getChatId(), TextConstants.ROLE_CHANGED_MESSAGE.getText(), KeyboardHelper.profileKeyboard), getUserName(message)));
+    }
+
+    @Override
+    public void interact(Long chatId) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

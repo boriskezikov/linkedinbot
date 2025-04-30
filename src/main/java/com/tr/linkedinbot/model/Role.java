@@ -1,9 +1,5 @@
 package com.tr.linkedinbot.model;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 public enum Role {
     DEVELOPER("Developer"),
     QA("QA"),
@@ -15,11 +11,11 @@ public enum Role {
     EMPTY_SEARCH("Роли поиска еще не установлены");
 
 
+    private final String description;
+
     Role(String description) {
         this.description = description;
     }
-
-    private final String description;
 
     public static Role fromString(String roleString) {
         for (var role : Role.values()) {
@@ -29,6 +25,7 @@ public enum Role {
         }
         return null;
     }
+
     @Override
     public String toString() {
         return description;

@@ -7,7 +7,9 @@
     <property name="uuid_function" value="uuid_generate_v4()" dbms="postgresql"/>
 
     <include file="v-1.0/changelog-v1.0-cumulative.xml" relativeToChangelogFile="true"/>
+    <include author="Oleg" file="scripts/V2_profile_array.sql" relativeToChangelogFile="true"/>
     <include file="v-1.1/changelog-v1.1-cumulative.xml" relativeToChangelogFile="true"/>
     <include file="v-1.2/changelog-v1.2-cumulative.xml" relativeToChangelogFile="true"/>
+    <include file="v-1.3/changelog-v1.3-cumulative.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -11,12 +11,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 
 public abstract class AbstractInteraction implements Interaction {
 
+    protected final ApplicationEventPublisher publisher;
+    protected final MetricSender metricSender;
     @Value("${bot.admin.chatId}")
     private String adminChatId;
-
-    protected final ApplicationEventPublisher publisher;
-
-    protected final MetricSender metricSender;
 
     protected AbstractInteraction(ApplicationEventPublisher publisher, MetricSender metricSender) {
         this.publisher = publisher;

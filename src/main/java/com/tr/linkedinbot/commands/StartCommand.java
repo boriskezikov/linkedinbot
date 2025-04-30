@@ -2,10 +2,8 @@ package com.tr.linkedinbot.commands;
 
 
 import static com.tr.linkedinbot.commands.TextConstants.START_MESSAGE;
-import static com.tr.linkedinbot.model.CommandEnum.*;
-
 import com.tr.linkedinbot.logic.MetricSender;
-import com.tr.linkedinbot.model.CommandEnum;
+import static com.tr.linkedinbot.model.CommandEnum.START;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -20,7 +18,6 @@ public class StartCommand extends ServiceCommand {
     @Override
     public void processMessage(AbsSender absSender, Message message, String[] arguments) {
         metricSender.registerCommandUse(START, message);
-        
         var chat = message.getChat();
         var userName = getUsername(chat);
         sendAnswer(absSender, chat.getId(), getCommandIdentifier(), userName, START_MESSAGE.getText(), START_MESSAGE.getParseMode());

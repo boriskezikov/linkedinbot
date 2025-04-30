@@ -3,6 +3,9 @@ package com.tr.linkedinbot.model;
 public enum BotState {
     ANNOUNCE,
     FEEDBACK,
+    AWAITING_EMAIL,
+    TO_PAY,
+    PAID,
     NOT_IN_INTERACTION,
     CHANGE_LINK,
     CHANGE_COUNTRY,

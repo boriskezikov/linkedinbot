@@ -6,5 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 public interface Interaction {
     void interact(Message message);
 
+    void interact(Long chatId);
+
     BotState getBotStateForInteraction();
 }

@@ -1,0 +1,36 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.11.xsd">
+
+    <changeSet id="add-payments" author="Boris Kezikov">
+        <createTable tableName="payments">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="pk_payment" nullable="false"/>
+            </column>
+
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="created_at" type="TIMESTAMP" defaultValueDate="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addColumn tableName="linked_in_profile">
+            <column name="free_usage" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)"/>
+            <column name="awaiting_email" type="BOOL"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

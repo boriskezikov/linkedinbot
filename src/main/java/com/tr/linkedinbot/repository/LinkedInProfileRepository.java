@@ -1,22 +1,12 @@
 package com.tr.linkedinbot.repository;
 
-import com.tr.linkedinbot.model.BotState;
 import com.tr.linkedinbot.model.Country;
 import com.tr.linkedinbot.model.LinkedInProfile;
 import com.tr.linkedinbot.model.Role;
-import jdk.jshell.Snippet;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
-import com.tr.linkedinbot.model.Role;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -32,6 +22,8 @@ public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile
 
 
     boolean existsByChatIdOrTgUser(Long chatId, String tgUser);
+
+    Optional<LinkedInProfile> findByChatIdOrTgUser(Long chatId, String tgUser);
 
     @Transactional
     @Query(value = "select * from linked_in_profile where to_remove = 'false' order by random() limit :#{#limit}", nativeQuery = true)
@@ -49,4 +41,25 @@ public interface LinkedInProfileRepository extends JpaRepository<LinkedInProfile
 
     @Query(value = "select * from linked_in_profile where registered_at >= :start_date and registered_at < :end_date", nativeQuery = true)
     List<LinkedInProfile> findAllByRegisterDate(@Param(value = "start_date") LocalDateTime startDate, @Param(value = "end_date") LocalDateTime endDate);
+
+    @Transactional
+    @Query(value = "with t as (select unnest(i.showed_ids) as ids from linked_in_profile i where i.chat_id = :chatId) " +
+            "select p.* " +
+            "from linked_in_profile p, t " +
+            "where p.chat_id not in (t.ids) " +
+            "  and to_remove = 'false' " +
+            "order by random() " +
+            "limit  :#{#limit}", nativeQuery = true)
+    List<LinkedInProfile> selectRandomForRequester(@Param(value = "chatId") Long chatId, @Param(value = "limit") @Valid Integer limit);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update linked_in_profile set showed_ids = ARRAY_APPEND(showed_ids, :shownId) where chat_id = :hostId", nativeQuery = true)
+    void writeShownChatId(@Param(value = "hostId") Long chatId,
+                          @Param(value = "shownId") Long shownId);
+
+
+    @Query(value = "select cardinality(i.showed_ids) as ids from linked_in_profile i where i.chat_id = :chatId", nativeQuery = true)
+    Long selectRequesterLoadSize(@Param(value = "chatId") Long chatId);
+
 }

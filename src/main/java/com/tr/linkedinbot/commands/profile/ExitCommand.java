@@ -4,6 +4,7 @@ import com.tr.linkedinbot.commands.ServiceCommand;
 import com.tr.linkedinbot.commands.TextConstants;
 import com.tr.linkedinbot.logic.MetricSender;
 import com.tr.linkedinbot.model.BotState;
+import static com.tr.linkedinbot.model.CommandEnum.EXIT;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,8 +13,6 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import static com.tr.linkedinbot.model.CommandEnum.EXIT;
-
 @Component
 @RequiredArgsConstructor
 public class ExitCommand extends ServiceCommand {
@@ -21,7 +20,7 @@ public class ExitCommand extends ServiceCommand {
     private final LinkedInProfileRepository repository;
 
     private final MetricSender metricSender;
-    
+
     @Override
     public String getCommandIdentifier() {
         return EXIT.getName();

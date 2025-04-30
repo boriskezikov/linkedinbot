@@ -1,7 +1,6 @@
 package com.tr.linkedinbot.notifications;
 
 import static com.tr.linkedinbot.commands.TextConstants.ADMIN_INTRODUCTION;
-import static com.tr.linkedinbot.commands.TextConstants.ADMIN_MESSAGE;
 import com.tr.linkedinbot.logic.LinkedInAccountService;
 import com.tr.linkedinbot.logic.LinkedInBot;
 import com.tr.linkedinbot.model.LinkedInProfile;

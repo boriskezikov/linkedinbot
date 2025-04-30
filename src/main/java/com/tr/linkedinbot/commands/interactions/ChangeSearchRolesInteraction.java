@@ -11,8 +11,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,6 +39,11 @@ public class ChangeSearchRolesInteraction extends AbstractInteraction {
                 .orElseThrow();
 
         publisher.publishEvent(new AnswerEvent(this, prepareAnswer(message.getChatId(), TextConstants.SEARCH_ROLES_CHANGED_MESSAGE.getText()), getUserName(message)));
+    }
+
+    @Override
+    public void interact(Long chatId) {
+        throw new UnsupportedOperationException();
     }
 
     private LinkedInProfile updateRoleSearch(Role role, LinkedInProfile linkedInProfile) {
