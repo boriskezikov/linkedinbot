@@ -41,6 +41,11 @@ public class ChangeSearchRolesInteraction extends AbstractInteraction {
         publisher.publishEvent(new AnswerEvent(this, prepareAnswer(message.getChatId(), TextConstants.SEARCH_ROLES_CHANGED_MESSAGE.getText()), getUserName(message)));
     }
 
+    @Override
+    public void interact(Long chatId) {
+        throw new UnsupportedOperationException();
+    }
+
     private LinkedInProfile updateRoleSearch(Role role, LinkedInProfile linkedInProfile) {
         Set<Role> searchRoles = linkedInProfile.getSearchRoles();
         if (searchRoles.contains(role)) {

@@ -40,6 +40,11 @@ public class ChangeCountryInteraction extends AbstractInteraction {
     }
 
     @Override
+    public void interact(Long chatId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public BotState getBotStateForInteraction() {
         return BotState.CHANGE_COUNTRY;
     }

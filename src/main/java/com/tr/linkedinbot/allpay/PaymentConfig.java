@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 public class PaymentConfig {
 
     private String apiPayUrl;
+    private String apiPayCheckUrl;
     private String apiLogin;
     private String apiKey;
 

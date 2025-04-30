@@ -5,13 +5,17 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.11.xsd">
 
-    <changeSet id="001-create-paypal-payment-chat" author="tony.stark">
-        <createTable tableName="paypal_payment_chat">
-            <column name="payment_id" type="VARCHAR(255)">
-                <constraints primaryKey="true" primaryKeyName="pk_paypal_payment_chat"/>
+    <changeSet id="add-payments" author="Boris Kezikov">
+        <createTable tableName="payments">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="pk_payment" nullable="false"/>
             </column>
 
             <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
 
@@ -21,12 +25,11 @@
         </createTable>
 
         <addColumn tableName="linked_in_profile">
-            <column name="paid" type="BOOLEAN" defaultValueBoolean="false">
-                <constraints nullable="false"/>
-            </column>
             <column name="free_usage" type="INT" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
+            <column name="email" type="varchar(255)"/>
+            <column name="awaiting_email" type="BOOL"/>
         </addColumn>
     </changeSet>
 

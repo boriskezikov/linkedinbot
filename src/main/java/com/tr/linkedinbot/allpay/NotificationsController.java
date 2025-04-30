@@ -1,55 +1,33 @@
 package com.tr.linkedinbot.allpay;
 
 import com.tr.linkedinbot.allpay.util.PaymentNotification;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.tr.linkedinbot.model.Payment;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/notifications")
+@Slf4j
+@RequiredArgsConstructor
 public class NotificationsController {
 
-    @Autowired
-    private PaymentService paymentService;
+    private final PaymentService paymentService;
 
-    /**
-     * Handles POST requests from Allpay containing payment notifications.
-     *
-     * @param notification The notification payload from Allpay.
-     * @return A ResponseEntity indicating the result.
-     */
     @PostMapping("/allpay")
-    public ResponseEntity<String> handleNotification(@RequestBody PaymentNotification notification) {
-        try {
-            // Build a map of parameters for signature calculation.
-            // Note: Do not include the "sign" field.
-            Map<String, Object> notificationMap = new HashMap<>();
-            notificationMap.put("order_id", notification.getOrder_id());
-            notificationMap.put("amount", notification.getAmount());
-            notificationMap.put("status", notification.getStatus());
-            notificationMap.put("foreign_card", notification.getForeign_card());
-            notificationMap.put("card_mask", notification.getCard_mask());
-            notificationMap.put("card_brand", notification.getCard_brand());
-            notificationMap.put("currency", notification.getCurrency());
-            notificationMap.put("receipt", notification.getReceipt());
-            notificationMap.put("add_field_1", notification.getAdd_field_1());
-            notificationMap.put("add_field_2", notification.getAdd_field_2());
-
-            if (notification.getStatus() != null
-                    && notification.getStatus() == 1
-                    && notification.getSign() != null) {
-                // Payment is verified as successful. Process your business logic here.
-                // For example: update order status, send confirmation email, etc.
-                return ResponseEntity.ok("Payment verified and processed successfully");
+    public ResponseEntity<Void> handleNotification(@RequestBody PaymentNotification notification) {
+        if (notification.getStatus() != null && notification.getStatus() == 1 && notification.getSign() != null) {
+            paymentService.updatePaymentData(Long.parseLong(notification.getOrder_id()), Payment.Status.PAID);
+            log.info("Payment passed successfully");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
             } else {
-                return ResponseEntity.badRequest().body("Invalid signature or unsuccessful payment");
+            log.error("Payment didnt go well, {}", notification);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Error processing notification: " + e.getMessage());
-        }
     }
 }

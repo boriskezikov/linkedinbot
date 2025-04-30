@@ -3,10 +3,12 @@ package com.tr.linkedinbot.allpay.util;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class PaymentNotification {
     private String order_id;
     private Double amount;

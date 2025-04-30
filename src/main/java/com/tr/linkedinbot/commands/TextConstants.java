@@ -12,6 +12,9 @@ public enum TextConstants {
     GET_PROFILES_LOAD_ACC_FIRST_MESSAGE("По нашим правилам, сначала ты грузишь свой профиль, а потом мы покажем тебе чужие\n" +
             "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 
+    GET_EMAIL("Пожалуйста дай свою почту. Мы отправим на него инвойс\n" +
+            "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
+
     GET_PROFILES_NO_USERS_MESSAGE("Нам пока нечего тебе показать( Пингани ребят в чате, чтоб грузили свои профили!\n" +
             "\n\nWith love from Israel HiTech\uD83D\uDE09", ParseMode.HTML),
 

@@ -34,6 +34,13 @@ public class InteractionManager {
     private void interactOnCurrentState(Message message, Optional<LinkedInProfile> linkedInProfile) {
         BotState profileState = linkedInProfile.map(LinkedInProfile::getState).orElse(BotState.EMPTY);
         interactionMap.getOrDefault(profileState, defaultInteraction).interact(message);
+    }
 
+    public void callInteraction(BotState state, Message message) {
+        interactionMap.getOrDefault(state, defaultInteraction).interact(message);
+    }
+
+    public void callInteraction(BotState state, Long chatId) {
+        interactionMap.getOrDefault(state, defaultInteraction).interact(chatId);
     }
 }

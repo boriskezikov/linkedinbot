@@ -1,9 +1,9 @@
 package com.tr.linkedinbot.model;
 
+import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import com.vladmihalcea.hibernate.type.array.ListArrayType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -30,6 +30,9 @@ public class LinkedInProfile {
     private LocalDateTime lastProfileGet;
     private LocalDateTime registeredAt;
 
+    private String email;
+    private Boolean awaitingEmail;
+
     @Enumerated(EnumType.STRING)
     private BotState state;
 
@@ -49,9 +52,7 @@ public class LinkedInProfile {
 
     private Integer pageNumber;
 
-    // === Новые поля для "платёжной" логики ===
-    private Boolean paid = false;        // false = не оплатил, true = оплатил
-    private Integer freeUsage = 0;       // сколько раз уже бесплатно взял профили
+    private Integer freeUsage = 0;
 
     @PostLoad
     public void loadSearchRoles() {

@@ -1,18 +1,15 @@
 package com.tr.linkedinbot.logic;
 
+import com.tr.linkedinbot.allpay.PaymentService;
 import static com.tr.linkedinbot.commands.TextConstants.INVALID_LINKEDIN_LINK_ERROR_MESSAGE;
 import static com.tr.linkedinbot.commands.TextConstants.PROFILE_ALREADY_SAVED_ERROR_MESSAGE;
 import com.tr.linkedinbot.exception.IllegalLinkedInProfileException;
 import com.tr.linkedinbot.model.BotState;
-import com.tr.linkedinbot.model.Country;
 import com.tr.linkedinbot.model.LinkedInProfile;
 import com.tr.linkedinbot.model.Role;
 import com.tr.linkedinbot.repository.LinkedInProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
@@ -37,6 +34,7 @@ public class LinkedInAccountService {
     // Ограничим 1 бесплатный вызов (можешь поменять на 2, 3, или убрать вовсе)
     private static final int MAX_FREE_USAGE = 1;
     private final LinkedInProfileRepository repository;
+    private final PaymentService paymentService;
 
     /**
      * Проверка валидности URL LinkedIn
@@ -73,6 +71,11 @@ public class LinkedInAccountService {
         };
     }
 
+    @Transactional
+    public LinkedInProfile saveProfile(LinkedInProfile profile) {
+        return repository.saveAndFlush(profile);
+    }
+
     private static Predicate<LinkedInProfile> getLinkedInProfilePredicate() {
         return linkedInProfile -> linkedInProfile.getRole() == null || linkedInProfile.getCountry() == null || linkedInProfile.getSearchRoles() == null || linkedInProfile.getSearchRoles().isEmpty();
     }
@@ -94,8 +97,6 @@ public class LinkedInAccountService {
                 .registeredAt(LocalDateTime.now())
                 .pageNumber(0)
                 .state(BotState.NOT_IN_INTERACTION)
-                // Новые поля:
-                .paid(false)
                 .freeUsage(0)
                 .build();
 
@@ -117,23 +118,17 @@ public class LinkedInAccountService {
      * Если не оплатил, но freeUsage < MAX_FREE_USAGE, тоже ок (пока что).
      * Иначе проверяем твоё условие "usage <= 20".
      */
-    public boolean checkRequesterLoadSize(Long chatId, String tgName) {
+    public boolean checkRequesterFreeLimit(Long chatId, String tgName) {
         log.info("Check requester load size {} {}", chatId, tgName);
-
         LinkedInProfile p = repository.getById(chatId);
-
-        if (Boolean.TRUE.equals(p.getPaid())) {
-            // оплаченный пользователь, пропускаем
+        if (hasPaid(chatId)) {
             return true;
         }
-        // если ещё не израсходовал бесплатную попытку
-        if (p.getFreeUsage() < MAX_FREE_USAGE) {
-            return true;
-        }
+        return p.getFreeUsage() < MAX_FREE_USAGE;
+    }
 
-        // Иначе считаем, что пользователь превысил лимит
-        Long usage = repository.selectRequesterLoadSize(chatId);
-        return usage <= 20; // твоя старая логика
+    public Optional<LinkedInProfile> getProfile(Long chatId) {
+        return repository.getByChatId(chatId);
     }
 
     /**
@@ -144,56 +139,17 @@ public class LinkedInAccountService {
      */
     public boolean checkRequesterBillingTime(Long chatId, String tgName) {
         log.info("Check requester billing time {} {}", chatId, tgName);
-
         LinkedInProfile p = repository.getById(chatId);
-
-        if (Boolean.TRUE.equals(p.getPaid())) {
-            return true;
-        }
-
+        boolean paid = paymentService.checkPaymentStatus(chatId);
+        if (paid) return true;
         if (p.getFreeUsage() < MAX_FREE_USAGE) {
             return true;
         }
-
         return LocalDateTime.now().isAfter(
                 p.getLastProfileGet().plusMinutes(2)
         );
     }
 
-    /**
-     * Загружаем случайные записи (для выдачи пользователю).
-     * Здесь же, если реально отдали профили и user не оплачен, увеличиваем freeUsage.
-     */
-    public List<LinkedInProfile> loadRandomRecords(Long chatId, String tgName) {
-        log.info("Loading profiles for {} {}", chatId, tgName);
-
-        var requestor = repository.getByChatId(chatId)
-                .orElseThrow(() -> new RuntimeException("Profile not found for chatId " + chatId));
-
-        // выбираем некую логику рандомного подбора
-        int limit = 10; // например, 10 штук
-        var all = repository.selectRandomForRequester(chatId, limit);
-
-        // записываем, что эти чаты "были показаны"
-        all.forEach(l -> repository.writeShownChatId(chatId, l.getChatId()));
-
-        if (!all.isEmpty()) {
-            updateLastGetDate(chatId);
-        }
-
-        // Если пользователь ещё не оплачен и ещё не израсходовал свою бесплатную попытку,
-        // то поднимем счётчик freeUsage
-        if (!Boolean.TRUE.equals(requestor.getPaid()) && requestor.getFreeUsage() < MAX_FREE_USAGE && !all.isEmpty()) {
-            requestor.setFreeUsage(requestor.getFreeUsage() + 1);
-            repository.save(requestor);
-        }
-
-        return all;
-    }
-
-    /**
-     * Обновлённая версия (если нужно указать limit явно)
-     */
     public List<LinkedInProfile> loadRandomRecords(Long chatId, String tgName, int limit) {
         log.info("Loading profiles for {} {}, limit {}", chatId, tgName, limit);
 
@@ -207,7 +163,7 @@ public class LinkedInAccountService {
             updateLastGetDate(chatId);
         }
 
-        if (!Boolean.TRUE.equals(requestor.getPaid()) && requestor.getFreeUsage() < MAX_FREE_USAGE && !all.isEmpty()) {
+        if (!hasPaid(chatId) && requestor.getFreeUsage() < MAX_FREE_USAGE && !all.isEmpty()) {
             requestor.setFreeUsage(requestor.getFreeUsage() + 1);
             repository.save(requestor);
         }
@@ -222,17 +178,6 @@ public class LinkedInAccountService {
         repository.save(p);
     }
 
-    /**
-     * Ставим user.paid = true после оплаты
-     */
-    public void setPaid(Long chatId) {
-        LinkedInProfile profile = repository.getById(chatId);
-        profile.setPaid(true);
-        // Если хочешь, можешь сбросить freeUsage в 0:
-        // profile.setFreeUsage(0);
-        repository.save(profile);
-    }
-
     // ---------------------------------------
     // Логика validateUpload осталась как есть
     // ---------------------------------------
@@ -240,17 +185,12 @@ public class LinkedInAccountService {
         return repository.existsByChatIdOrTgUser(chatId, tgName);
     }
 
-    public long countUsers() {
-        return repository.count();
+    public Optional<LinkedInProfile> findByChatAndTg(Long chatId, String tgName) {
+        return repository.findByChatIdOrTgUser(chatId, tgName);
     }
 
-    private List<LinkedInProfile> getLinkedInProfiles(LinkedInProfile linkedInProfile) {
-        var pageNumber = linkedInProfile.getPageNumber();
-        Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by("registeredAt"));
-
-        return linkedInProfile.getCountry().equals(Country.ISRAEL) ?
-                repository.findAllByRoleInAndCountry(linkedInProfile.getSearchRoles(), linkedInProfile.getCountry(), pageable) :
-                repository.findAllByRoleIn(linkedInProfile.getSearchRoles(), pageable);
+    public long countUsers() {
+        return repository.count();
     }
 
     public List<LinkedInProfile> loadIncompleteProfilesWithDaysOffset(int days) {
@@ -322,14 +262,8 @@ public class LinkedInAccountService {
         return linkedInProfile -> linkedInProfile.getRole() != null && linkedInProfile.getCountry() != null;
     }
 
-    private void updatePageNumber(LinkedInProfile linkedInProfile, List<LinkedInProfile> all) {
-        if (all.isEmpty()) {
-            linkedInProfile.setPageNumber(0);
-        } else {
-            var pageNumber = linkedInProfile.getPageNumber();
-            linkedInProfile.setPageNumber(pageNumber + 1);
-        }
-        repository.save(linkedInProfile);
+    public boolean hasPaid(Long chatId) {
+        return paymentService.checkPaymentStatus(chatId);
     }
 
 }
